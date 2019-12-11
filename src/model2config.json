@@ -1,0 +1,13 @@
+{
+    "darknet":
+    {
+        "yolov3": {
+          "weights": "../training/config/darknet/yolo_default_weights/yolov3.weights",
+          "config": "../training/config/darknet/yolo_default_cfgs/yolov3.cfg"
+        },
+        "yolov3-tiny": {
+            "weights": "../training/config/darknet/yolo_default_weights/yolov3-tiny.weights",
+            "config": "../training/config/darknet/yolo_default_cfgs/yolov3-tiny.cfg"
+        }   
+    }
+}

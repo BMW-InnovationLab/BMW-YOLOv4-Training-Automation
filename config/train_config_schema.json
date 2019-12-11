@@ -1,0 +1,372 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "http://example.com/root.json",
+    "type": "object",
+    "title": "The Root Schema",
+    "required": [
+        "data",
+        "model",
+        "training"
+    ],
+    "properties": {
+        "data": {
+            "$id": "#/properties/data",
+            "type": "object",
+            "title": "All properties related to the dataset",
+            "required": [
+                "classes",
+                "train_ratio"
+            ],
+            "properties": {
+                "name": {
+                    "$id": "#/properties/data/properties/name",
+                    "type": "string",
+                    "title": "A name given to yolo config when created",
+                    "default": "",
+                    "examples": [
+                        "obj"
+                    ],
+                    "pattern": "^(.*)$"
+                },
+                "classes": {
+                    "$id": "#/properties/data/properties/classes",
+                    "type": "array",
+                    "title": "An array of classes of your dataset",
+                    "items": {
+                        "$id": "#/properties/data/properties/classes/items",
+                        "type": "string",
+                        "title": "Each class",
+                        "default": "",
+                        "examples": [
+                            "dog",
+                            "cat"
+                        ],
+                        "pattern": "^(.*)$"
+                    }
+                },
+                "train_ratio": {
+                    "$id": "#/properties/data/properties/train_ratio",
+                    "type": "number",
+                    "title": "The Train_ratio to split your dataset",
+                    "default": 0.0,
+                    "examples": [
+                        0.8
+                    ]
+                }
+            }
+        },
+        "model": {
+            "$id": "#/properties/model",
+            "type": "object",
+            "title": "The Model Schema",
+            "required": [
+                "framework",
+                "model_name",
+                "custom_weights",
+                "generate_custom_anchors",
+                "train_image_width",
+                "train_image_height"
+            ],
+            "properties": {
+                "framework": {
+                    "$id": "#/properties/model/properties/framework",
+                    "type": "string",
+                    "title": "The Framework Schema.  Only darknet is supported here",
+                    "default": "",
+                    "examples": [
+                        "darknet"
+                    ],
+                    "pattern": "^(.*)$"
+                },
+                "model_name": {
+                    "$id": "#/properties/model/properties/model_name",
+                    "type": "string",
+                    "title": "The model to start training from",
+                    "default": "",
+                    "examples": [
+                        "yolov3",
+                        "yolov3-tiny",
+                        "darknet53.conv.74"
+                    ],
+                    "pattern": "^(.*)$"
+                },
+                "custom_weights": {
+                    "$id": "#/properties/model/properties/custom_weights",
+                    "type": "object",
+                    "title": "Whether or not to use a custom model (for transfer learning) or the original yolo weights",
+                    "required": [
+                        "enable",
+                        "name"
+                    ],
+                    "properties": {
+                        "enable": {
+                            "$id": "#/properties/model/properties/custom_weights/properties/enable",
+                            "type": "boolean",
+                            "title": "The Enable Schema",
+                            "default": false,
+                            "examples": [
+                                false
+                            ]
+                        },
+                        "name": {
+                            "$id": "#/properties/model/properties/custom_weights/properties/name",
+                            "type": "string",
+                            "title": "The Name Schema",
+                            "default": "",
+                            "examples": [
+                                "darknet53.conv.74",
+                                "my_training_0210.weights"
+                            ],
+                            "pattern": "^(.*)$"
+                        }
+                    }
+                },
+                "generate_custom_anchors": {
+                    "$id": "#/properties/model/properties/generate_custom_anchors",
+                    "type": "boolean",
+                    "title": "Generate custom anchors for your dataset (recommended)",
+                    "default": false,
+                    "examples": [
+                        true
+                    ]
+                },
+                "batch_size": {
+                    "$id": "#/properties/model/properties/batch_size",
+                    "type": "integer",
+                    "title": "The Batch_size Schema",
+                    "default": 0,
+                    "examples": [
+                        2
+                    ]
+                },
+                "max_batches": {
+                    "$id": "#/properties/model/properties/max_batches",
+                    "type": "integer",
+                    "title": "The Max_batches Schema",
+                    "default": 0,
+                    "examples": [
+                        120000
+                    ]
+                },
+                "subdivisions": {
+                    "$id": "#/properties/model/properties/subdivisions",
+                    "type": "integer",
+                    "title": "The Subdivisions Schema",
+                    "default": 0,
+                    "examples": [
+                        1
+                    ]
+                },
+                "train_image_width": {
+                    "$id": "#/properties/model/properties/train_image_width",
+                    "type": "integer",
+                    "title": "The Train_image_width Schema",
+                    "default": 0,
+                    "examples": [
+                        416
+                    ]
+                },
+                "train_image_height": {
+                    "$id": "#/properties/model/properties/train_image_height",
+                    "type": "integer",
+                    "title": "The Train_image_height Schema",
+                    "default": 0,
+                    "examples": [
+                        416
+                    ]
+                },
+                "angle": {
+                    "$id": "#/properties/model/properties/angle",
+                    "type": "integer",
+                    "title": "The Angle Schema",
+                    "default": 0,
+                    "examples": [
+                        0
+                    ]
+                },
+                "saturation": {
+                    "$id": "#/properties/model/properties/saturation",
+                    "type": "number",
+                    "title": "The Saturation Schema",
+                    "default": 0.0,
+                    "examples": [
+                        1.5
+                    ]
+                },
+                "exposure": {
+                    "$id": "#/properties/model/properties/exposure",
+                    "type": "number",
+                    "title": "The Exposure Schema",
+                    "default": 0.0,
+                    "examples": [
+                        1.5
+                    ]
+                },
+                "hue": {
+                    "$id": "#/properties/model/properties/hue",
+                    "type": "number",
+                    "title": "The Hue Schema",
+                    "default": 0.0,
+                    "examples": [
+                        0.1
+                    ]
+                }
+            }
+        },
+        "training": {
+            "$id": "#/properties/training",
+            "type": "object",
+            "title": "The Training Schema",
+            "required": [
+                "gpus",
+                "calculate_map",
+                "custom_api",
+                "dashboard",
+                "tensorboard",
+                "web_ui"
+            ],
+            "properties": {
+                "gpus": {
+                    "$id": "#/properties/training/properties/gpus",
+                    "type": "array",
+                    "title": "The Gpus Schema",
+                    "items": {
+                        "$id": "#/properties/training/properties/gpus/items",
+                        "type": "integer",
+                        "title": "The Items Schema",
+                        "default": 0,
+                        "examples": [
+                            0
+                        ]
+                    }
+                },
+                "calculate_map": {
+                    "$id": "#/properties/training/properties/calculate_map",
+                    "type": "boolean",
+                    "title": "The Calculate_map Schema",
+                    "default": false,
+                    "examples": [
+                        true
+                    ]
+                },
+                "custom_api": {
+                    "$id": "#/properties/training/properties/custom_api",
+                    "type": "object",
+                    "title": "The Custom_api Schema",
+                    "required": [
+                        "enable",
+                        "port"
+                    ],
+                    "properties": {
+                        "enable": {
+                            "$id": "#/properties/training/properties/custom_api/properties/enable",
+                            "type": "boolean",
+                            "title": "The Enable Schema",
+                            "default": false,
+                            "examples": [
+                                true
+                            ]
+                        },
+                        "port": {
+                            "$id": "#/properties/training/properties/custom_api/properties/port",
+                            "type": "integer",
+                            "title": "The Port Schema",
+                            "default": 0,
+                            "examples": [
+                                8000
+                            ]
+                        }
+                    }
+                },
+                "dashboard": {
+                    "$id": "#/properties/training/properties/dashboard",
+                    "type": "object",
+                    "title": "The Dashboard Schema",
+                    "required": [
+                        "enable",
+                        "port"
+                    ],
+                    "properties": {
+                        "enable": {
+                            "$id": "#/properties/training/properties/dashboard/properties/enable",
+                            "type": "boolean",
+                            "title": "The Enable Schema",
+                            "default": false,
+                            "examples": [
+                                true
+                            ]
+                        },
+                        "port": {
+                            "$id": "#/properties/training/properties/dashboard/properties/port",
+                            "type": "integer",
+                            "title": "The Port Schema",
+                            "default": 0,
+                            "examples": [
+                                3000
+                            ]
+                        }
+                    }
+                },
+                "tensorboard": {
+                    "$id": "#/properties/training/properties/tensorboard",
+                    "type": "object",
+                    "title": "The Tensorboard Schema",
+                    "required": [
+                        "enable",
+                        "port"
+                    ],
+                    "properties": {
+                        "enable": {
+                            "$id": "#/properties/training/properties/tensorboard/properties/enable",
+                            "type": "boolean",
+                            "title": "The Enable Schema",
+                            "default": false,
+                            "examples": [
+                                false
+                            ]
+                        },
+                        "port": {
+                            "$id": "#/properties/training/properties/tensorboard/properties/port",
+                            "type": "integer",
+                            "title": "The Port Schema",
+                            "default": 0,
+                            "examples": [
+                                6006
+                            ]
+                        }
+                    }
+                },
+                "web_ui": {
+                    "$id": "#/properties/training/properties/web_ui",
+                    "type": "object",
+                    "title": "The Web_ui Schema",
+                    "required": [
+                        "enable",
+                        "port"
+                    ],
+                    "properties": {
+                        "enable": {
+                            "$id": "#/properties/training/properties/web_ui/properties/enable",
+                            "type": "boolean",
+                            "title": "The Enable Schema",
+                            "default": false,
+                            "examples": [
+                                false
+                            ]
+                        },
+                        "port": {
+                            "$id": "#/properties/training/properties/web_ui/properties/port",
+                            "type": "integer",
+                            "title": "The Port Schema",
+                            "default": 0,
+                            "examples": [
+                                8090
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
