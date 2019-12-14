@@ -1,6 +1,6 @@
 # YOLOv3 Training Automation API for Linux
 
-This repository allows you to get started with training a state-of-the-art Deep Learning model with little to no configuration needed!  You provide your labeled dataset and you can start the training right away and monitor it in many different ways like TensorBoard and a custom REST API.
+This repository allows you to get started with training a state-of-the-art Deep Learning model with little to no configuration needed!  You provide your labeled dataset and you can start the training right away and monitor it in many different ways like TensorBoard or a custom REST API and GUI. Training with YOLOv3 has never been so easy.
 
 ![](swagger_yolo_training.png)
 
