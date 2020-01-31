@@ -173,7 +173,7 @@ def get_configuration_file() -> dict:
 )
 def get_validation():
     """Returns prediction on image with the latest saved weights \n
-       Right image is the one predicted by the model and left image is the ground truth"""
+       Left image is the one predicted by the model and Right image is the ground truth"""
     if Path(prediction_image_path).exists():
         list_im: list = [prediction_image_path, ground_truth_image_path]
         imgs: list = [Image.open(str(i)) for i in list_im]
