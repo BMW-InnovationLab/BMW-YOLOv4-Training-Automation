@@ -46,7 +46,10 @@ If you have a GPU: Volta, Xavier, Turing and higher
 ```bash
 sudo docker build -f docker/Dockerfile -t darknet_yolov4_gpu:1 --build-arg GPU=1 --build-arg CUDNN=1 --build-arg CUDNN_HALF=1 --build-arg OPENCV=1 .
 ```
-
+If you are behind proxy 
+```bash
+sudo docker build -f docker/Dockerfile -t darknet_yolov4_gpu:1 --build-arg GPU=1 --build-arg CUDNN=1 --build-arg CUDNN_HALF=1 --build-arg OPENCV=1 --build-arg http_proxy='' --build-arg https_proxy='' .
+```
 For CPU only, you can run the same command while setting GPU=0 CUDNN=0 and naming it darknet_yolo_cpu:1 for clarity.
 
 ```bash
@@ -57,6 +60,7 @@ If you want multi-core cpu training you can add OPENMP=1 to the build
 ```bash
 sudo docker build -f docker/Dockerfile -t darknet_yolov4_gpu:1 --build-arg GPU=0 --build-arg CUDNN=0 --build-arg CUDNN_HALF=0 --build-arg OPENCV=1 --build-arg OPENMP=1 .
 ```
+
 ## Preparing your dataset
 
 We provided a `sample_dataset` to show how your data should be structured in order to start the training seemlesly.
