@@ -1,7 +1,7 @@
-# YOLOv3 Training Automation API for Linux
+# YOLOv4 Training Automation API for Linux
 
-This repository allows you to get started with training a state-of-the-art Deep Learning model with little to no configuration needed!  You provide your labeled dataset and you can start the training right away and monitor it in many different ways like TensorBoard or a custom REST API and GUI. Training with YOLOv3 has never been so easy.
-
+This repository allows you to get started with training a state-of-the-art Deep Learning model with little to no configuration needed!  You provide your labeled dataset and you can start the training right away and monitor it in many different ways like TensorBoard or a custom REST API and GUI. Training with YOLOv4  has never been so easy.
+This repository has also cross compatibility with Yolov3 training 
 ![](swagger_yolo_training.png)
 
 ## Prerequisites
@@ -22,7 +22,7 @@ chmod +x scripts/install_docker.sh && source scripts/install_docker.sh
 Prepare the docker image with all weights for GPU usage
 
 ```bash
-sudo docker build -f docker/Dockerfile -t darknet_yolo_gpu:1 --build-arg GPU=1 --build-arg CUDNN=1 --build-arg CUDNN_HALF=0 --build-arg OPENCV=1 --build-arg DOWNLOAD_ALL=1 .
+sudo docker build -f docker/Dockerfile -t darknet_yolov4_gpu:1 --build-arg GPU=1 --build-arg CUDNN=1 --build-arg CUDNN_HALF=0 --build-arg OPENCV=1 --build-arg DOWNLOAD_ALL=1 .
 ```
 ![terminal_example](gifs/1.gif)
 
@@ -38,20 +38,31 @@ The environment is dockerized to run on GPU or CPU.
 For GPU, you need to build the image in the following way:
 
 ```bash
-sudo docker build -f docker/Dockerfile -t darknet_yolo_gpu:1 --build-arg GPU=1 --build-arg CUDNN=1 --build-arg CUDNN_HALF=0 --build-arg OPENCV=1 .
+sudo docker build -f docker/Dockerfile -t darknet_yolov4_gpu:1 --build-arg GPU=1 --build-arg CUDNN=1 --build-arg CUDNN_HALF=0 --build-arg OPENCV=1 .
+```
+
+If you have a GPU: Volta, Xavier, Turing and higher
+
+```bash
+sudo docker build -f docker/Dockerfile -t darknet_yolov4_gpu:1 --build-arg GPU=1 --build-arg CUDNN=1 --build-arg CUDNN_HALF=1 --build-arg OPENCV=1 .
 ```
 
 For CPU only, you can run the same command while setting GPU=0 CUDNN=0 and naming it darknet_yolo_cpu:1 for clarity.
 
 ```bash
-sudo docker build -f docker/Dockerfile -t darknet_yolo_cpu:1 --build-arg GPU=0 --build-arg CUDNN=0 --build-arg CUDNN_HALF=0 --build-arg OPENCV=1 .
+sudo docker build -f docker/Dockerfile -t darknet_yolov4_cpu:1 --build-arg GPU=0 --build-arg CUDNN=0 --build-arg CUDNN_HALF=0 --build-arg OPENCV=1 .
 ```
+If you want multi-core cpu training you can add OPENMP=1 to the build 
 
+```bash
+sudo docker build -f docker/Dockerfile -t darknet_yolov4_gpu:1 --build-arg GPU=0 --build-arg CUDNN=0 --build-arg CUDNN_HALF=0 --build-arg OPENCV=1 --build-arg OPENMP=1 .
+```
 ## Preparing your dataset
 
 We provided a `sample_dataset` to show how your data should be structured in order to start the training seemlesly.
 The `train_config.json` file found in `sample_dataset` is a copy of the template `config/train_config.json.template` with needed modifications.  The template can as well be copied as is while making sure to remove the '.template' from the name.
-You can also provide your own `train.txt` and `test.txt` to specify which images will be used for training and which ones are for testing.  If not provided, the dataset will be split according to the `data/train_ratio` (by default 80% train 20% test)
+You can also provide your own `train.txt` and `test.txt` to specify which images will be used for training and which ones are for testing.  If not provided, the dataset will be split according to the `data/train_ratio` (by default 80% train 20% test).
+If you are using **Yolov4** training please make sure to choose your `yolov4` instead of **yolov3** in `train_config.json`  `model/model-name` **Yolov4** specific hyperparams ("mosaic","blur")
 
 ## Starting the training
 
@@ -174,7 +185,7 @@ Change your current working directory to be inside the repo. The following steps
 yolov3.weights
 
 ```bash
-wget https://pjreddie.com/media/files/yolov3.weights -P config/darknet/yolo_default_weights
+wget https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov3.weights -P config/darknet/yolo_default_weights
 ```
 
 yolov3-tiny.weights
@@ -189,6 +200,13 @@ darknet53.conv.74
 wget https://pjreddie.com/media/files/darknet53.conv.74 -P config/darknet/yolo_default_weights
 ```
 
+ yolov4.weights
+
+```bash
+wget https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov4.weights -P config/darknet/yolov4_default_weights
+```
+
+
 
 ## Known Issues
 
@@ -198,6 +216,8 @@ Issue related to darknet itself can be filed in [the correct repo](https://githu
 - If during training you see nan values for avg (loss) field - then training goes wrong, but if nan is in some other lines - then training goes well.
 - If error Out of memory occurs then you should try increasing subdivisions to 16, 32 or 64 or have a smaller image size.
 - If training finishes immediately without any error you should decrease batch size and subdivisions.
+- if training on multiple GPU produce nan try decreasing the learning rate to 0,00065
+
 
 ## Acknowledgements
 
@@ -208,3 +228,5 @@ Issue related to darknet itself can be filed in [the correct repo](https://githu
 Lynn Nassif, Beirut, Lebanon
 
 Nour Azzi, Beirut, Lebanon
+
+Hadi Koubeissy , Beirut, Lebanon

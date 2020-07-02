@@ -13,26 +13,16 @@ from PIL import Image, JpegImagePlugin
 from logging.handlers import RotatingFileHandler
 
 
-class DarknetCoach(Coach):
-    """
-    This is the concrete implementation of Coach for darknet framework 
-    """
+class DarknetCoachV4(Coach):
 
-    def __init__(
-        self,
-        model_name: str = "yolov3",
-        generate_custom_anchors: bool = True,
-        angle: int = 0,
-        hue: float = 0.1,
-        exposure: float = 1.5,
-        saturation: float = 1.5,
-        learning_rate_yolov3:float = 0.001,
-        calculate_map: bool = True,
-        web_ui: bool = False,
-        web_ui_port: int = 8090,
-        *args,
-        **kwargs
-    ) -> None:
+    # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    def __init__(self, model_name: str = "yolov4", generate_custom_anchors: bool = True, angle: int = 0,
+                 hue: float = 0.1, exposure: float = 1.5, saturation: float = 1.5, calculate_map: bool = True,
+                 web_ui: bool = False, web_ui_port: int = 8090, learning_rate_yolov3: float = 0.001,
+                 mosaic: bool = False,
+                 blur: bool = False, learning_rate_yolov4: float = 0.00261, *args,
+                 **kwargs) -> None:
+        print("using yolo v4 version")
         super().__init__(model_name=model_name, *args, **kwargs)
         self._images_path: Path = self._working_dir / "assets/images"
         self._labels_path: Path = self._working_dir / "assets/labels/yolo"
@@ -45,9 +35,14 @@ class DarknetCoach(Coach):
         self._exposure: float = exposure
         self._hue: float = hue
         self._calculate_map: bool = calculate_map
-        self._learning_rate_yolov3 :float= learning_rate_yolov3
         self._web_ui: bool = web_ui
         self._web_ui_port: int = web_ui_port
+        self._learning_rate_yolov3: float = learning_rate_yolov3
+        self._learning_rate_yolov4: float = learning_rate_yolov4
+        self._mosaic: bool = mosaic
+        self._blur: bool = blur
+
+    # -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     # TODO is_data_valid() return true false
     def check_data(self):
@@ -93,7 +88,11 @@ class DarknetCoach(Coach):
 
         # Create custom_folder ex: hello00_20190822:15:26:20
         self._logger.info("Creating your training folder")
-        _custom_training_folder_path: Path = self._custom_training_dir / Path(os.getenv('TRAIN_NAME') + "_" + os.getenv("TRAIN_START_TIME"))
+
+        _custom_training_folder_path: Path = self._custom_training_dir / Path(
+            os.getenv('TRAIN_NAME') + "_" + os.getenv("TRAIN_START_TIME"))
+        if (os.path.exists(_custom_training_folder_path)):
+            shutil.rmtree(_custom_training_folder_path)
         self._custom_training_folder_path: Path = _custom_training_folder_path
         Path.mkdir(_custom_training_folder_path)
 
@@ -118,7 +117,6 @@ class DarknetCoach(Coach):
         self._logger.info(
             "Copying {} file to needed location".format(weights_path.stem)
         )
-
         copy_weights_file(
             source=weights_path,
             destination=self._custom_weights_path,
@@ -136,7 +134,7 @@ class DarknetCoach(Coach):
                 train_txt: str = "".join(train_txt_file.readlines())
 
             with open(
-                destination_train_txt_path, "w", encoding="utf-8"
+                    destination_train_txt_path, "w", encoding="utf-8"
             ) as train_txt_file:
                 train_txt_file.write(
                     update_label_file(
@@ -152,7 +150,7 @@ class DarknetCoach(Coach):
                     test_txt: str = "".join(test_txt_file.readlines())
 
                 with open(
-                    destination_test_txt_path, "w", encoding="utf-8"
+                        destination_test_txt_path, "w", encoding="utf-8"
                 ) as test_txt_file:
                     test_txt_file.write(
                         update_label_file(
@@ -177,12 +175,12 @@ class DarknetCoach(Coach):
             )
 
             with open(
-                self._custom_training_folder_path / "train.txt", "w+"
+                    self._custom_training_folder_path / "train.txt", "w+"
             ) as train_file:
                 train_file.writelines("\n".join(train_images_list))
 
             with open(
-                self._custom_training_folder_path / "test.txt", "w+"
+                    self._custom_training_folder_path / "test.txt", "w+"
             ) as test_file:
                 test_file.writelines("\n".join(test_images_list))
 
@@ -274,7 +272,7 @@ class DarknetCoach(Coach):
         self._logger.info("Modifying configuration file as needed")
         with open(saved_config_path, "w", encoding="utf-8") as customize_cfg_file:
             customize_cfg_file.write(
-                customize_yolo_cfg(
+                customize_yolo_cfg_v4(
                     yolo_cfg=default_yolo_cfg,
                     classes_nb=len(self._classes),
                     batch_size=self._batch_size,
@@ -286,8 +284,10 @@ class DarknetCoach(Coach):
                     saturation=self._saturation,
                     exposure=self._exposure,
                     hue=self._hue,
-                    learning_rate_yolov3 =self._learning_rate_yolov3,
                     custom_anchors=self._custom_anchors,
+                    learning_rate_yolov4=self._learning_rate_yolov4,
+                    mosaic=self._mosaic,
+                    blur=self._blur
                 )
             )
 
@@ -306,6 +306,7 @@ class DarknetCoach(Coach):
             "-clear",
             "1",
         ]
+
         if self._gpus:
             arg: str = ",".join(str(gpu) for gpu in self._gpus)
             command.append("-gpus")
@@ -347,6 +348,7 @@ class DarknetCoach(Coach):
                 subprocess.Popen(
                     ["tensorboard", "--logdir", "runs"], stderr=DEVNULL, stdout=DEVNULL
                 )
+
         # Create a rotating log
         yolo_training_logger: logging.Logger = logging.getLogger("Rotating Log")
         yolo_training_logger.setLevel(logging.INFO)
@@ -357,7 +359,6 @@ class DarknetCoach(Coach):
             yolo_log_path, maxBytes=51200, backupCount=1
         )
         yolo_training_logger.addHandler(yolo_handler)
-
         Path.mkdir(self._working_dir / "data")
         os.symlink(
             self._working_dir / "darknet/data/labels", self._working_dir / "data/labels"

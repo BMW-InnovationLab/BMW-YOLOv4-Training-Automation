@@ -9,12 +9,12 @@
     },
     "model": {
         "framework": "darknet",
-        "model_name": "yolov3",
+        "model_name": "yolov4",
 	    "custom_weights": {
             "enable": false,
             "name": "darknet53.conv.74"
         },
-        "generate_custom_anchors": true,
+        "generate_custom_anchors": false,
         "batch_size": 2,
 	    "max_batches": 120000,
         "subdivisions": 1,
@@ -23,7 +23,15 @@
    	    "angle": 0,
         "saturation": 1.5,
         "exposure": 1.5,
-        "hue": 0.1
+        "hue": 0.1,
+       "yolov3_config": {
+            "learning_rate": 0.001
+        },
+        "yolov4_config":
+        {   "learning_rate": 0.0013,
+            "mosaic": false,
+            "blur": false
+        }
     },
     "training": {
         "gpus": [

@@ -8,7 +8,7 @@ ARG CUDNN=1
 ARG CUDNN_HALF=0
 ARG OPENCV=1
 ARG DOWNLOAD_ALL=0
-
+ARG OPENMP=0
 # To save you a headache
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
@@ -19,7 +19,7 @@ RUN apt-get update && \
 	apt-get upgrade -y && \
 	apt-get install -y clang-format wget apt-utils build-essential\
 	checkinstall cmake pkg-config yasm git vim curl\
-	autoconf automake libtool libopencv-dev
+	autoconf automake libtool libopencv-dev build-essential
 
 
 # Install python-dev and pip
@@ -36,7 +36,7 @@ WORKDIR /training
 RUN git clone https://github.com/AlexeyAB/darknet.git 
 WORKDIR darknet
 # Checkout the last working version in our case
-RUN git checkout 5a6afe96d3aa8aed19405577db7dba0ff173c848
+RUN git checkout tags/darknet_yolo_v4_pre
 
 # Modify Makefile according to needed env variables
 RUN \ 
@@ -48,6 +48,7 @@ RUN \
 	sed -i "s/CUDNN=0/CUDNN=${CUDNN}/" Makefile && \
 	sed -i "s/CUDNN_HALF=0/CUDNN_HALF=${CUDNN_HALF}/" Makefile && \
 	sed -i "s/OPENCV=0/OPENCV=${OPENCV}/" Makefile && \
+	sed -i "s/OPENMP=0/OPENMP=${OPENMP}/" Makefile && \
 	make
 
 WORKDIR /training
@@ -58,6 +59,6 @@ COPY ./config ./config
 
 # If ARG DOWNLOAD_ALL = 1, download 3 weights into config directly
 RUN chmod u+x ./config/darknet/yolo_default_weights/download_weights.sh && ./config/darknet/yolo_default_weights/download_weights.sh ${DOWNLOAD_ALL} "/training/config/darknet/yolo_default_weights"
-
+RUN chmod u+x ./config/darknet/yolov4_default_weights/download_weights.sh && ./config/darknet/yolov4_default_weights/download_weights.sh ${DOWNLOAD_ALL} "/training/config/darknet/yolov4_default_weights"
 # Default command
 CMD ["python3", "main.py"]
