@@ -345,7 +345,7 @@ class DarknetCoach(Coach):
             )
             with open(os.devnull, "w") as DEVNULL:
                 subprocess.Popen(
-                    ["tensorboard", "--logdir", "runs"], stderr=DEVNULL, stdout=DEVNULL
+                    ["tensorboard", "--logdir ", " runs "," --port ", str(self._tensorboard_port)], stderr=DEVNULL, stdout=DEVNULL
                 )
         # Create a rotating log
         yolo_training_logger: logging.Logger = logging.getLogger("Rotating Log")
