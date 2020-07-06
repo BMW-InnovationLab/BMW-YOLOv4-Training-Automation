@@ -36,7 +36,7 @@ WORKDIR /training
 RUN git clone https://github.com/AlexeyAB/darknet.git 
 WORKDIR darknet
 # Checkout the last working version in our case
-RUN git checkout tags/darknet_yolo_v4_pre
+RUN git checkout 00919eeb99f73484cf9f51b277a4e4ebacef70df
 
 # Modify Makefile according to needed env variables
 RUN \ 
