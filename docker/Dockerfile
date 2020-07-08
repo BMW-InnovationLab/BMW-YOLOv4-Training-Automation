@@ -36,8 +36,8 @@ WORKDIR /training
 RUN git clone https://github.com/AlexeyAB/darknet.git 
 WORKDIR darknet
 #Checkout version should be yolov4 when stable version is released 
-# Checkout the last working version in our case
-RUN git checkout 00919eeb99f73484cf9f51b277a4e4ebacef70df
+# Checkout the last working version of Yolov4_pre
+RUN git checkout bef28445e57cd560fa3d0a24af98a562d289135b
 
 # Modify Makefile according to needed env variables
 RUN \ 
