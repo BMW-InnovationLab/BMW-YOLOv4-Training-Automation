@@ -35,6 +35,7 @@ WORKDIR /training
 # Fetch Repo
 RUN git clone https://github.com/AlexeyAB/darknet.git 
 WORKDIR darknet
+#Checkout version should be yolov4 when stable version is released 
 # Checkout the last working version in our case
 RUN git checkout 00919eeb99f73484cf9f51b277a4e4ebacef70df
 
