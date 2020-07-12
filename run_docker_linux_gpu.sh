@@ -13,7 +13,7 @@ if [ -f $configfile ]; then
 	tensorboard=`jq .training.tensorboard.enable $configfile`
 	if [ "$tensorboard" = "true" ]; then
 		tensorboard_port=`jq .training.tensorboard.port $configfile`
-		ports="$ports -p $tensorboard_port:6006"
+		ports="$ports -p $tensorboard_port:$tensorboard"
 	fi
 	web_ui=`jq .training.web_ui.enable $configfile`
 	if [ "$web_ui" = "true" ]; then
