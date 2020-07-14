@@ -93,23 +93,23 @@ dogs-dataset_20191110_14:21:41
 ├── config
 │   ├── obj.data
 │   ├── obj.names
-│   └── yolov3.cfg
+│   └── yolov4.cfg
 ├── test.txt
 ├── train.txt
 ├── weights
 │   ├── initial.weights
-│   ├── yolov3_10000.weights
-│   ├── yolov3_1000.weights
-│   ├── yolov3_2000.weights
-│   ├── yolov3_3000.weights
-│   ├── yolov3_4000.weights
-│   ├── yolov3_5000.weights
-│   ├── yolov3_6000.weights
-│   ├── yolov3_7000.weights
-│   ├── yolov3_8000.weights
-│   ├── yolov3_9000.weights
-│   ├── yolov3_best.weights
-│   └── yolov3_last.weights
+│   ├── yolov4_10000.weights
+│   ├── yolov4_1000.weights
+│   ├── yolov4_2000.weights
+│   ├── yolov4_3000.weights
+│   ├── yolov4_4000.weights
+│   ├── yolov4_5000.weights
+│   ├── yolov4_6000.weights
+│   ├── yolov4_7000.weights
+│   ├── yolov4_8000.weights
+│   ├── yolov4_9000.weights
+│   ├── yolov4_best.weights
+│   └── yolov4_last.weights
 ├── yolo_events.log
 └── yolo_events.log.1
 ```
