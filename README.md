@@ -147,37 +147,29 @@ Some of the elements are specific to YOLO itself like saturation, hue, rotation,
 ## Benchmark
 
 <table>
-  <tr>
-    <th></th>
-    <th colspan="4">OS</th>
-  </tr>
-  <tr>
-    <td></td>
-    <td>Windows</td>
-    <td colspan="3">Ubuntu</td>
-  </tr>
-  <tr>
-    <td></td>
-    <td>CPU</td>
-    <td colspan="2">CPU</td>
-    <td>GPU</td>
-  </tr>
-  <tr>
-    <td></td>
-    <td>Intel Xeon CPU 2.3 GHz</td>
-    <td>Intel Xeon CPU 2.3 GHz</td>
-    <td>Intel Core i9-7900 3.3 GHz</td>
-    <td>GeForce GTX 1080</td>
-  </tr>
-  <tr>
-    <td>pascalvoc_dataset</td>
-    <td>0.793 second/image</td>
-    <td>0.885 second/image</td>
-    <td>0.295 second/image</td>
-    <td>0.0592 second/image</td>
-  </tr>
+    <thead align="center">
+        <tr>
+            <th></th>
+            <th colspan=3>Ubuntu</th>
+        </tr>
+    </thead>
+    <thead align="center">
+        <tr>
+            <th>Network\Hardware</th>
+            <th>Intel Xeon CPU 2.3 GHz</th>
+            <th>Intel Core i9-7900 3.3 GHZ</th>
+            <th>Tesla V100</th>
+        </tr>
+    </thead>
+    <tbody align="center">
+        <tr>
+            <td>COCO Dataset</td>
+            <td>0.259 seconds/image</td>
+            <td>0.281 seconds/image</td>
+            <td>0.0691 seconds/image</td>
+        </tr>
+    </tbody>
 </table>
-
 
 ## Preparing weights
 
