@@ -87,7 +87,8 @@
                     "examples": [
                         "yolov3",
                         "yolov3-tiny",
-                        "darknet53.conv.74"
+                        "darknet53.conv.74",
+                        "yolov4"
                     ],
                     "pattern": "^(.*)$"
                 },
@@ -211,7 +212,68 @@
                     "examples": [
                         0.1
                     ]
-                }
+                },
+                "yolov3_config":
+                    {"$id":"#/properties/model/properties/yolov3_config",
+                        "type":"object",
+                        "title": "yolov3 learning rate  ",
+                        "required": [
+                            "learning_rate"
+                        ],
+                        "properties": {
+                            "learning_rate": {
+                                "$id": "#/properties/model/properties/yolov3_config/properties/learning_rate",
+                                "type": "number",
+                                "title": "The learning rate for yolov3 training ",
+                                "default": 0.001,
+                                "examples": [
+                                    0.0013
+                                ]
+                            }
+                        }
+
+                    },
+                "yolov4_config":
+                    {"$id":"#/properties/model/properties/yolov4_config", 
+                        "type":"object",
+                        "title": "The yolov4 special configuration regarding data augmentation feature. those configuration will have no effect when using yolov3 training ",
+                        "required": [
+                            "learning_rate",
+                            "mosaic",
+                            "blur"
+                        ],
+                        "properties": {
+                            "learning_rate": {
+                                "$id": "#/properties/model/properties/yolov4_config/properties/learning_rate",
+                                "type": "number",
+                                "title": "The learning rate for yolov4",
+                                "default": 0.0013,
+                                "examples": [
+                                    0.00261,
+                                    0.001
+                                ]
+                            },
+                            "mosaic": {
+                                "$id": "#/properties/model/properties/yolov4_config/properties/mosaic",
+                                "type": "boolean",
+                                "title": "Enable mosaic augmentation technique used in yolov4 during training that will group multiple images into 1 image",
+                                "default": false,
+                                "examples": [
+                                    true
+                                ]
+                            },
+                            "blur": {
+                                "$id": "#/properties/model/properties/yolov4_config/properties/blur",
+                                "type": "boolean",
+                                "title": "Enable blur augmentation technique used in yolov4 during training that will blur images ",
+                                "default": false,
+                                "examples": [
+                                    true
+                                ]
+                            }
+                        }
+
+                    }
             }
         },
         "training": {

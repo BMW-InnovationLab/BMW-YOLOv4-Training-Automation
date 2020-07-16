@@ -26,6 +26,7 @@ class DarknetCoach(Coach):
         hue: float = 0.1,
         exposure: float = 1.5,
         saturation: float = 1.5,
+        learning_rate_yolov3:float = 0.001,
         calculate_map: bool = True,
         web_ui: bool = False,
         web_ui_port: int = 8090,
@@ -44,6 +45,7 @@ class DarknetCoach(Coach):
         self._exposure: float = exposure
         self._hue: float = hue
         self._calculate_map: bool = calculate_map
+        self._learning_rate_yolov3 :float= learning_rate_yolov3
         self._web_ui: bool = web_ui
         self._web_ui_port: int = web_ui_port
 
@@ -116,6 +118,7 @@ class DarknetCoach(Coach):
         self._logger.info(
             "Copying {} file to needed location".format(weights_path.stem)
         )
+
         copy_weights_file(
             source=weights_path,
             destination=self._custom_weights_path,
@@ -283,6 +286,7 @@ class DarknetCoach(Coach):
                     saturation=self._saturation,
                     exposure=self._exposure,
                     hue=self._hue,
+                    learning_rate_yolov3 =self._learning_rate_yolov3,
                     custom_anchors=self._custom_anchors,
                 )
             )
@@ -302,7 +306,6 @@ class DarknetCoach(Coach):
             "-clear",
             "1",
         ]
-
         if self._gpus:
             arg: str = ",".join(str(gpu) for gpu in self._gpus)
             command.append("-gpus")
@@ -342,9 +345,8 @@ class DarknetCoach(Coach):
             )
             with open(os.devnull, "w") as DEVNULL:
                 subprocess.Popen(
-                    ["tensorboard", "--logdir", "runs"], stderr=DEVNULL, stdout=DEVNULL
+                    ["tensorboard", "--logdir", "./runs","--port", str(self._tensorboard_port)], stderr=DEVNULL, stdout=DEVNULL
                 )
-
         # Create a rotating log
         yolo_training_logger: logging.Logger = logging.getLogger("Rotating Log")
         yolo_training_logger.setLevel(logging.INFO)

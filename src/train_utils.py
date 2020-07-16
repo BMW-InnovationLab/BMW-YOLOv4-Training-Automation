@@ -106,6 +106,83 @@ def split_train_test(
 
     return train_images_list, test_images_list
 
+def customize_yolo_cfg_v4(yolo_cfg: str, classes_nb: int, batch_size: int, subdivisions: int, max_batches: int,
+                          image_width: int, image_height: int, angle: int, saturation: float, exposure: float,
+                          hue: float,
+                          custom_anchors: str, mosaic:bool, blur:bool, learning_rate_yolov4:float ) -> str:
+    custom_yolo_cfg: str = yolo_cfg
+    # Set classes
+    custom_yolo_cfg = re.sub(
+            r"(classes *= *)(.+)", r"\1 {}".format(classes_nb), custom_yolo_cfg
+    )
+    # Set batch_size
+    custom_yolo_cfg = re.sub(
+            r"(batch *= *)(.+)", r"\1 {}".format(batch_size), custom_yolo_cfg
+    )
+    # Set subdivisions
+    custom_yolo_cfg = re.sub(
+            r"(subdivisions *= *)(.+)", r"\1 {}".format(subdivisions), custom_yolo_cfg
+    )
+    # Set image_width
+    custom_yolo_cfg = re.sub(
+            r"(width *= *)(.+)", r"\1 {}".format(image_width), custom_yolo_cfg
+    )
+    # Set image_height
+    custom_yolo_cfg = re.sub(
+            r"(height *= *)(.+)", r"\1 {}".format(image_height), custom_yolo_cfg
+    )
+    # Set max_batches
+    custom_yolo_cfg = re.sub(
+            r"(max_batches *= *)(.+)", r"\1 {}".format(max_batches), custom_yolo_cfg
+    )
+    # Set steps
+    steps = [int(0.8 * max_batches), int(0.9 * max_batches)]
+    custom_yolo_cfg = re.sub(
+            r"(steps *= *)(.+)",
+            r"\1 {}".format("{},{}".format(steps[0], steps[1])),
+            custom_yolo_cfg,
+    )
+    # Set angle
+    custom_yolo_cfg = re.sub(
+            r"(angle *= *)(.+)", r"\1 {}".format(angle), custom_yolo_cfg
+    )
+    # Set saturation
+    custom_yolo_cfg = re.sub(
+            r"(saturation *= *)(.+)", r"\1 {}".format(saturation), custom_yolo_cfg
+    )
+    # Set exposure
+    custom_yolo_cfg = re.sub(
+            r"(exposure *= *)(.+)", r"\1 {}".format(exposure), custom_yolo_cfg
+    )
+    # Set hue
+    custom_yolo_cfg = re.sub(r"(hue *= *)(.+)", r"\1 {}".format(hue), custom_yolo_cfg)
+
+    #set learning rate
+    custom_yolo_cfg = re.sub(r"(learning_rate *= *)(.+)", r"\1 {}".format(learning_rate_yolov4), custom_yolo_cfg)
+    # set mosaic augmentation
+    custom_yolo_cfg = re.sub(r"(mosaic *= *)(.+)", r"\1 {}".format(int(mosaic)), custom_yolo_cfg)
+    # set blur augmentation
+    custom_yolo_cfg = re.sub(r"(blur *= *)(.+)", r"\1 {}".format(int(blur)), custom_yolo_cfg)
+    
+    # Set custom_anchors
+    if custom_anchors:
+        custom_yolo_cfg = re.sub(
+                r"(anchors *= *)(.+)", r"\1 {}".format(custom_anchors), custom_yolo_cfg
+        )
+    # Set custom filters
+    all_cfg_lines: list = custom_yolo_cfg.split("\n")
+    yolo_indexes: list = [i for i, line in enumerate(all_cfg_lines) if "[yolo]" in line]
+    for yolo_layer in yolo_indexes:
+        for i, cfg_line in enumerate(reversed(all_cfg_lines[:yolo_layer])):
+            if "filters" in cfg_line:
+                all_cfg_lines[yolo_layer - i - 1] = re.sub(
+                        r"(filters *= *)(.+)",
+                        r"\1 {}".format((classes_nb + 5) * 3),
+                        cfg_line,
+                )
+                break
+
+    return "\n".join(all_cfg_lines)
 
 def customize_yolo_cfg(
     yolo_cfg: str,
@@ -120,6 +197,7 @@ def customize_yolo_cfg(
     exposure: float,
     hue: float,
     custom_anchors: str,
+    learning_rate_yolov3:float
 ) -> str:
 
     custom_yolo_cfg: str = yolo_cfg
@@ -168,6 +246,11 @@ def customize_yolo_cfg(
     )
     # Set hue
     custom_yolo_cfg = re.sub(r"(hue *= *)(.+)", r"\1 {}".format(hue), custom_yolo_cfg)
+
+    #set learning rate
+    custom_yolo_cfg = re.sub(
+        r"(learning_rate *= *)(.+)", r"\1 {}".format(learning_rate_yolov3), custom_yolo_cfg
+    )
     # Set custom_anchors
     if custom_anchors:
         custom_yolo_cfg = re.sub(
