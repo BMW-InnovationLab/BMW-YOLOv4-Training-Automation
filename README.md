@@ -58,7 +58,7 @@ sudo docker build -f docker/Dockerfile -t darknet_yolov4_cpu:1 --build-arg GPU=0
 If you want multi-core cpu training you can add OPENMP=1 to the build 
 
 ```bash
-sudo docker build -f docker/Dockerfile -t darknet_yolov4_gpu:1 --build-arg GPU=0 --build-arg CUDNN=0 --build-arg CUDNN_HALF=0 --build-arg OPENCV=1 --build-arg OPENMP=1 .
+sudo docker build -f docker/Dockerfile -t darknet_yolov4_cpu:1 --build-arg GPU=0 --build-arg CUDNN=0 --build-arg CUDNN_HALF=0 --build-arg OPENCV=1 --build-arg OPENMP=1 .
 ```
 
 ## Preparing your dataset
