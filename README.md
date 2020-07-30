@@ -1,7 +1,8 @@
 # YOLOv4-v3 Training Automation API for Linux
 
-This repository allows you to get started with training a state-of-the-art Deep Learning model with little to no configuration needed!  You provide your labeled dataset and you can start the training right away and monitor it in many different ways like TensorBoard or a custom REST API and GUI. Training with YOLOv4  has never been so easy.
-This repository has also cross compatibility with Yolov3 training 
+This repository, based on AlexeyAB's darknet repro, allows you to get started with training a state-of-the-art Deep Learning model with little to no configuration needed!  You provide your labeled dataset and you can start the training right away and monitor it in many different ways like TensorBoard or a custom REST API and GUI. Training with YOLOv4  has never been so easy.
+This repository has also cross compatibility with Yolov3 training.
+
 You can also use our BMW-Labeltool-lite to label your dataset with yolo labels format https://github.com/BMW-InnovationLab/BMW-Labeltool-Lite.git
 
 
@@ -223,6 +224,8 @@ Issue related to darknet itself can be filed in [the correct repo](https://githu
 [robotron.de](https://www.robotron.de/)
 
 [inmind.ai](https://www.inmind.ai/)
+
+AlexeyAB (https://github.com/AlexeyAB)
 
 Lynn Nassif, Beirut, Lebanon
 
