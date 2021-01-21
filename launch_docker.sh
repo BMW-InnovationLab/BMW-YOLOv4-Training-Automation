@@ -19,6 +19,7 @@ if [ -f $configfile ]; then
 		web_ui_port=`jq .training.web_ui.port $configfile`
 		ports="$ports -p $web_ui_port:$web_ui_port"
 	fi
+
 	docker run  --gpus all --rm --runtime=nvidia -it \
 				-e TRAIN_NAME=$container_name \
 				-e TRAIN_START_TIME="$(date '+%Y%m%d_%H:%M:%S')" $ports \

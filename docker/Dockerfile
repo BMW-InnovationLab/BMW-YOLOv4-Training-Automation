@@ -5,10 +5,11 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 ARG GPU=1
 ARG CUDNN=1
-ARG CUDNN_HALF=0
+ARG CUDNN_HALF=1
 ARG OPENCV=1
-ARG DOWNLOAD_ALL=0
+ARG DOWNLOAD_ALL=1
 ARG OPENMP=0
+
 # To save you a headache
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
