@@ -25,22 +25,22 @@ RUN apt-get update && \
 # Install python-dev and pip
 RUN apt-get update && apt-get install -y python3-pip python3.6-dev
 
-# Install all needed python librarires 
+# Install all needed python librarires
 COPY ./docker/requirements.txt .
 RUN pip3 install -r requirements.txt
 
-# Create working directory 
+# Create working directory
 WORKDIR /training
 
 # Fetch Repo
-RUN git clone https://github.com/AlexeyAB/darknet.git 
+RUN git clone https://github.com/AlexeyAB/darknet.git
 WORKDIR darknet
-#Checkout version should be yolov4 when stable version is released 
+#Checkout version should be yolov4 when stable version is released
 # Checkout the last working version of Yolov4_pre
 RUN git checkout bef28445e57cd560fa3d0a24af98a562d289135b
 
 # Modify Makefile according to needed env variables
-RUN \ 
+RUN \
 	sed -i ':a;N;$!ba;s/getchar();/ /6' ./src/detector.c && \
 	sed -i 's/fprintf(stderr, "%d/\/\/fprintf(stderr, "%d/' ./src/detector.c && \
 	sed -i 's/fmax(calc_map_for_each, 100)/300/' ./src/detector.c && \
@@ -61,5 +61,6 @@ COPY ./config ./config
 # If ARG DOWNLOAD_ALL = 1, download 3 weights into config directly
 RUN chmod u+x ./config/darknet/yolo_default_weights/download_weights.sh && ./config/darknet/yolo_default_weights/download_weights.sh ${DOWNLOAD_ALL} "/training/config/darknet/yolo_default_weights"
 RUN chmod u+x ./config/darknet/yolov4_default_weights/download_weights.sh && ./config/darknet/yolov4_default_weights/download_weights.sh ${DOWNLOAD_ALL} "/training/config/darknet/yolov4_default_weights"
+
 # Default command
 CMD ["python3", "main.py"]

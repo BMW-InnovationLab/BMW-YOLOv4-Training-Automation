@@ -15,7 +15,7 @@ from logging.handlers import RotatingFileHandler
 
 class DarknetCoach(Coach):
     """
-    This is the concrete implementation of Coach for darknet framework 
+    This is the concrete implementation of Coach for darknet framework
     """
 
     def __init__(

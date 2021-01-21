@@ -5,9 +5,8 @@
 # Test Data
 test_data/
 trainings/
-yolov4/dataset/images
-yolov4/dataset/labels
-yolov4/sample_dataset
+dataset/images
+dataset/labels
 
 
 .vscode/
