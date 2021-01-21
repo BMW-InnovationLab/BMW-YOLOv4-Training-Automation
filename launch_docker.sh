@@ -1,10 +1,9 @@
-echo -n "Enter your dataset's absolute path (folder containing images', labels' folders and configuration file): " 
-read folder_path
+folder_path="$(pwd)/dataset"
+container_name="yolov4-midgard"
 configfile=$folder_path/train_config.json
-echo -n "Choose a name for the docker container: " 
-read container_name
 ports=''
-if [ -f $configfile ]; then 
+
+if [ -f $configfile ]; then
 	custom_api=`jq .training.custom_api.enable $configfile`
 	if [ "$custom_api" = "true" ]; then
 		custom_api_port=`jq .training.custom_api.port $configfile`
@@ -20,8 +19,16 @@ if [ -f $configfile ]; then
 		web_ui_port=`jq .training.web_ui.port $configfile`
 		ports="$ports -p $web_ui_port:$web_ui_port"
 	fi
-	sudo docker run --rm --runtime=nvidia -it -e TRAIN_NAME=$container_name -e TRAIN_START_TIME="$(date '+%Y%m%d_%H:%M:%S')" $ports -v $folder_path:/training/assets -v $(pwd)/trainings:/training/custom_training -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro --name $container_name darknet_yolov4_cpu:1 ; 
-else	
+	docker run  --gpus all --rm --runtime=nvidia -it \
+				-e TRAIN_NAME=$container_name \
+				-e TRAIN_START_TIME="$(date '+%Y%m%d_%H:%M:%S')" $ports \
+				-v $folder_path:/training/assets \
+				-v $(pwd)/trainings:/training/custom_training \
+				-v /etc/timezone:/etc/timezone:ro \
+				-v /etc/localtime:/etc/localtime:ro \
+				--name $container_name \
+				$USER/yolov4:latest \
+				python3 src/main.py
+else
 	echo "Error: Configuration file not found in the provided path"
 fi
-
