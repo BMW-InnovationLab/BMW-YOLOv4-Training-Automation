@@ -5,6 +5,8 @@
 # Test Data
 test_data/
 trainings/
+yolov4/dataset
+yolov4/sample_dataset
 
 
 .vscode/
