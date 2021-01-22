@@ -2,6 +2,7 @@ folder_path="$(pwd)/dataset"
 container_name="yolov4-midgard"
 configfile=$folder_path/train_config.json
 ports=''
+interactive_options='-it'
 
 COMMAND="/bin/bash"
 
@@ -20,6 +21,7 @@ do
             ;;
 		--test-darknet)
 			COMMAND="ls /training/darknet/darknet"
+			interactive_options=''
 			;;
     esac
     shift
@@ -43,7 +45,8 @@ if [ -f $configfile ]; then
 		ports="$ports -p $web_ui_port:$web_ui_port"
 	fi
 
-	docker run  --gpus all --rm --runtime=nvidia -it \
+	docker run  --gpus all --rm --runtime=nvidia \
+				$interactive_options \
 				-e TRAIN_NAME=$container_name \
 				-e TRAIN_START_TIME="$(date '+%Y%m%d_%H:%M:%S')" \
 				-v $folder_path:/training/assets \
