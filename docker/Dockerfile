@@ -7,7 +7,6 @@ ARG GPU=1
 ARG CUDNN=1
 ARG CUDNN_HALF=1
 ARG OPENCV=1
-ARG DOWNLOAD_ALL=1
 ARG OPENMP=0
 
 # To save you a headache
@@ -27,8 +26,7 @@ RUN apt-get update && \
 RUN apt-get update && apt-get install -y python3-pip python3.6-dev
 
 # Install all needed python librarires
-COPY ./docker/requirements.txt .
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r ./docker/requirements.txt
 
 # Create working directory
 WORKDIR /training
@@ -36,7 +34,8 @@ WORKDIR /training
 # Fetch Repo
 RUN git clone https://github.com/AlexeyAB/darknet.git
 WORKDIR darknet
-#Checkout version should be yolov4 when stable version is released
+
+# Checkout version should be yolov4 when stable version is released
 # Checkout the last working version of Yolov4_pre
 RUN git checkout bef28445e57cd560fa3d0a24af98a562d289135b
 
@@ -54,14 +53,6 @@ RUN \
 	make
 
 WORKDIR /training
-
-# Copy needed files in the container
-COPY ./src .
-COPY ./config ./config
-
-# If ARG DOWNLOAD_ALL = 1, download 3 weights into config directly
-RUN chmod u+x ./config/darknet/yolo_default_weights/download_weights.sh && ./config/darknet/yolo_default_weights/download_weights.sh ${DOWNLOAD_ALL} "/training/config/darknet/yolo_default_weights"
-RUN chmod u+x ./config/darknet/yolov4_default_weights/download_weights.sh && ./config/darknet/yolov4_default_weights/download_weights.sh ${DOWNLOAD_ALL} "/training/config/darknet/yolov4_default_weights"
 
 # Default command
 CMD ["python3", "main.py"]

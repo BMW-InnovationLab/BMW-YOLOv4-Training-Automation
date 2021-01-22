@@ -13,7 +13,7 @@ You can also use our BMW-Labeltool-lite to label your dataset with yolo labels f
 
 ## Quickstart
 
-All the commands should need to train a dataset are:
+All the commands you should need to train a dataset are:
 
 ```bash
 scripts/install_dependencies.sh

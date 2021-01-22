@@ -28,7 +28,7 @@ class DarknetCoachV4(Coach):
         self._labels_path: Path = self._working_dir / "assets/labels/yolo"
         self._train_txt_path: Path = self._working_dir / "assets/train.txt"
         self._test_txt_path: Path = self._working_dir / "assets/test.txt"
-        self._model2config_path: Path = self._working_dir / "model2config.json"
+        self._model2config_path: Path = self._working_dir / "src/model2config.json"
         self._generate_custom_anchors: bool = generate_custom_anchors
         self._angle: int = angle
         self._saturation: float = saturation

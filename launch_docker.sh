@@ -9,7 +9,7 @@ COMMAND="/bin/bash"
 while test $# -gt 0
 do
     case "$1" in
-        --run) COMMAND="python3 main.py"
+        --run) COMMAND="python3 src/main.py"
             ;;
         --inference)
 			set="$2"
@@ -49,6 +49,8 @@ if [ -f $configfile ]; then
 				$interactive_options \
 				-e TRAIN_NAME=$container_name \
 				-e TRAIN_START_TIME="$(date '+%Y%m%d_%H:%M:%S')" \
+				-v $(pwd)/src:/training/src \
+				-v $(pwd)/config:/training/config \
 				-v $folder_path:/training/assets \
 				-v $(pwd)/trainings:/training/custom_training \
 				-v /etc/timezone:/etc/timezone:ro \
