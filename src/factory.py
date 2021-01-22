@@ -23,6 +23,7 @@ class CoachFactory(object):
         train_ratio: float = train_config.get("data").get("train_ratio", 0.8)
         batch_size: int = train_config.get("model").get("batch_size", 2)
         subdivisions: int = train_config.get("model").get("subdivisions", 1)
+        channels: int = train_config.get("model").get("channels", 3)
         image_width: int = train_config.get("model").get("train_image_width", 416)
         image_height: int = train_config.get("model").get("train_image_height", 416)
         max_batches: int = train_config.get("model").get("max_batches", None)
@@ -69,7 +70,7 @@ class CoachFactory(object):
         if not max_batches:
             max_batches = 2000 * len(classes)
 
-        if str(framework).lower() == "darknet"and str(model_name).lower() == "yolov3":
+        if str(framework).lower() == "darknet" and str(model_name).lower() == "yolov3":
             generate_custom_anchors: bool = train_config.get("model").get(
                 "generate_custom_anchors", False
             )
@@ -95,6 +96,7 @@ class CoachFactory(object):
                 batch_size=batch_size,
                 max_batches=max_batches,
                 subdivisions=subdivisions,
+                channels=channels,
                 image_width=image_width,
                 image_height=image_height,
                 angle=angle,
@@ -162,7 +164,7 @@ class CoachFactory(object):
                 learning_rate_yolov4=learning_rate_yolov4,
                 mosaic=mosaic,
                 blur=blur,
-            )        
+            )
 
         else:
             raise ConfigError(framework, "No such available framework")

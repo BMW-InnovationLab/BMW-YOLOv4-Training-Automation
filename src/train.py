@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 
 class Coach(ABC):
     """
-    This is the base class for all training frameworks 
+    This is the base class for all training frameworks
     """
 
     def __init__(

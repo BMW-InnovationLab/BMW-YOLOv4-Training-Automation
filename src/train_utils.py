@@ -163,7 +163,7 @@ def customize_yolo_cfg_v4(yolo_cfg: str, classes_nb: int, batch_size: int, subdi
     custom_yolo_cfg = re.sub(r"(mosaic *= *)(.+)", r"\1 {}".format(int(mosaic)), custom_yolo_cfg)
     # set blur augmentation
     custom_yolo_cfg = re.sub(r"(blur *= *)(.+)", r"\1 {}".format(int(blur)), custom_yolo_cfg)
-    
+
     # Set custom_anchors
     if custom_anchors:
         custom_yolo_cfg = re.sub(
@@ -189,6 +189,7 @@ def customize_yolo_cfg(
     classes_nb: int,
     batch_size: int,
     subdivisions: int,
+    channels: int,
     max_batches: int,
     image_width: int,
     image_height: int,
@@ -212,6 +213,10 @@ def customize_yolo_cfg(
     # Set subdivisions
     custom_yolo_cfg = re.sub(
         r"(subdivisions *= *)(.+)", r"\1 {}".format(subdivisions), custom_yolo_cfg
+    )
+    # Set channels
+    custom_yolo_cfg = re.sub(
+        r"(channels *= *)(.+)", r"\1 {}".format(channels), custom_yolo_cfg
     )
     # Set image_width
     custom_yolo_cfg = re.sub(

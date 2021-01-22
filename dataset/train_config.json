@@ -1,6 +1,6 @@
 {
     "data": {
-	    "name": "obj",
+        "name": "obj",
         "classes": [
             "MAV"
         ],
@@ -17,6 +17,7 @@
         "batch_size": 64,
 	    "max_batches": 10000,
         "subdivisions": 32,
+        "channels": 3,
         "train_image_width": 416,
         "train_image_height": 416,
    	    "angle": 0,
