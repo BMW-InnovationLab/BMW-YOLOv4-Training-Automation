@@ -23,4 +23,4 @@ jobs:
       run: ./build_docker.sh
 
     - name: Launch
-      run: ./launch_docker.sh
+      run: ./launch_docker.sh --test-darknet
