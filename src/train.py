@@ -14,11 +14,13 @@ class Coach(ABC):
     def __init__(
         self,
         name: str = "obj",
+        enable_training = False,
         classes: list = [],
         train_ratio: float = 0.8,
         model_name: str = None,
         batch_size: int = 2,
         subdivisions: int = 1,
+        channels: int = 3,
         image_width: int = 416,
         image_height: int = 416,
         max_batches: int = None,
@@ -37,11 +39,13 @@ class Coach(ABC):
 
         self._working_dir: Path = Path.cwd()
         self._name: str = name
+        self._enable_training: str = enable_training
         self._classes: list = classes
         self._train_ratio: int = train_ratio
         self._model_name: int = model_name
         self._batch_size: int = batch_size
         self._subdivisons: int = subdivisions
+        self._channels: int = channels
         self._image_width: int = image_width
         self._image_height: int = image_height
         self._max_batches: int = max_batches

@@ -28,7 +28,7 @@ class DarknetCoachV4(Coach):
         self._labels_path: Path = self._working_dir / "assets/labels/yolo"
         self._train_txt_path: Path = self._working_dir / "assets/train.txt"
         self._test_txt_path: Path = self._working_dir / "assets/test.txt"
-        self._model2config_path: Path = self._working_dir / "model2config.json"
+        self._model2config_path: Path = self._working_dir / "src/model2config.json"
         self._generate_custom_anchors: bool = generate_custom_anchors
         self._angle: int = angle
         self._saturation: float = saturation
@@ -360,19 +360,57 @@ class DarknetCoachV4(Coach):
             yolo_log_path, maxBytes=51200, backupCount=1
         )
         yolo_training_logger.addHandler(yolo_handler)
-        Path.mkdir(self._working_dir / "data")
-        os.symlink(
-            self._working_dir / "darknet/data/labels", self._working_dir / "data/labels"
-        )
+
+        if not os.path.exists(self._working_dir / "data"):
+            Path.mkdir(self._working_dir / "data")
+            os.symlink(
+                self._working_dir / "darknet/data/labels", self._working_dir / "data/labels"
+            )
 
         update_arg(self._tensorboard, self._working_dir)
+
+        print("\nYou can now monitor the training using any of the provided means or by viewing the logs saved in the custom training folder\n")
+
+        if self._enable_training:
+            self.start_process(command)
+        else:
+            self.infer(yolo_cfg_path)
+
+    def infer(self, yolo_cfg_path):
+        last_weights_path = "{}/{}_last.weights".format(
+            str(self._custom_weights_path), self._model_name
+        )
+        labeled_prediction_image_path = "{}/predictions.jpg".format(
+            str(self._working_dir)
+        )
+
+        step = 0
+
+        if self._prediction_image:
+            get_prediction(
+                darknet_path=self._darknet_exec,
+                dot_data_path=str(self._custom_dot_data_path),
+                yolo_cfg_path=yolo_cfg_path,
+                weights_path=last_weights_path,
+                image=self._prediction_image,
+            )
+            if self._tensorboard:
+                img: JpegImagePlugin.JpegImageFile = Image.open(
+                    labeled_prediction_image_path
+                )
+                img: np.ndarray = np.transpose(img, (2, 0, 1))
+                writer.add_image("predictions", img, step)
+                step += 1
+
+        while True:
+            sleep(1)
+
+    def start_process(self, command):
         self._logger.info("Starting YOLO training")
         process: subprocess.Popen = subprocess.Popen(
             command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
         )
-        print(
-            "\nYou can now monitor the training using any of the provided means or by viewing the logs saved in the custom training folder\n"
-        )
+
         pid_path = self._working_dir / "pid.txt"
         with open(pid_path, "w+") as pid:
             pid.write(str(process.pid))
@@ -389,6 +427,7 @@ class DarknetCoachV4(Coach):
             line: bytes = process.stdout.readline()
             if not line:
                 break
+
             line_decoded: str = line.decode("utf-8")
             yolo_training_logger.info(line_decoded)
             process_output(line_decoded)

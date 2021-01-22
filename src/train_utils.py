@@ -106,8 +106,8 @@ def split_train_test(
 
     return train_images_list, test_images_list
 
-def customize_yolo_cfg_v4(yolo_cfg: str, classes_nb: int, batch_size: int, subdivisions: int, max_batches: int,
-                          image_width: int, image_height: int, angle: int, saturation: float, exposure: float,
+def customize_yolo_cfg_v4(yolo_cfg: str, classes_nb: int, batch_size: int, subdivisions: int, channels: int,
+                          max_batches: int, image_width: int, image_height: int, angle: int, saturation: float, exposure: float,
                           hue: float,
                           custom_anchors: str, mosaic:bool, blur:bool, learning_rate_yolov4:float ) -> str:
     custom_yolo_cfg: str = yolo_cfg
@@ -319,7 +319,7 @@ def data_checkup(
         raise ConfigError(images_without_labels, "No labels found for these images")
 
     # Check if weights file exists
-    with open("model2config.json", "r", encoding="utf-8") as convertionReader:
+    with open("src/model2config.json", "r", encoding="utf-8") as convertionReader:
         model2config = json.load(convertionReader)
 
     model_config: str = model2config.get(framework).get(model_name, None)

@@ -15,7 +15,6 @@ class CoachFactory(object):
             train_config: dict = json.load(yolo_train_config_file)
 
         # TODO add JSON Schema validation because this is bad
-
         framework: str = train_config.get("model").get("framework")
         model_name: str = train_config.get("model").get("model_name")
         classes: list = train_config.get("data").get("classes")
@@ -29,6 +28,7 @@ class CoachFactory(object):
         max_batches: int = train_config.get("model").get("max_batches", None)
         learning_rate_yolov3 : float = train_config.get("model").get("yolov3_config").get("learning_rate", 0.001)
 
+        enable_training = False
 
         # modification by hadi to get yolov4 specific variable of data augmentation
         learning_rate_yolov4 : float = train_config.get("model").get("yolov4_config").get("learning_rate",0.0013)
@@ -70,26 +70,30 @@ class CoachFactory(object):
         if not max_batches:
             max_batches = 2000 * len(classes)
 
-        if str(framework).lower() == "darknet" and str(model_name).lower() == "yolov3":
-            generate_custom_anchors: bool = train_config.get("model").get(
-                "generate_custom_anchors", False
-            )
-            angle: int = train_config.get("model").get("angle", 0)
-            saturation: float = train_config.get("model").get("saturation", 1.5)
-            exposure: float = train_config.get("model").get("exposure", 1.5)
-            hue: float = train_config.get("model").get("hue", 0.1)
-            calculate_map: bool = train_config.get("training").get(
-                "calculate_map", True
-            )
-            web_ui_el = train_config.get("training").get(
-                "web_ui", {"enable": False, "port": 8090}
-            )
-            web_ui: bool = web_ui_el["enable"]
-            web_ui_port: int = web_ui_el["port"]
+        generate_custom_anchors: bool = train_config.get("model").get(
+            "generate_custom_anchors", False
+        )
 
+        angle: int = train_config.get("model").get("angle", 0)
+        saturation: float = train_config.get("model").get("saturation", 1.5)
+        exposure: float = train_config.get("model").get("exposure", 1.5)
+        hue: float = train_config.get("model").get("hue", 0.1)
+
+        calculate_map: bool = train_config.get("training").get(
+            "calculate_map", True
+        )
+        web_ui_el = train_config.get("training").get(
+            "web_ui", {"enable": False, "port": 8090}
+        )
+
+        web_ui: bool = web_ui_el["enable"]
+        web_ui_port: int = web_ui_el["port"]
+
+        if str(framework).lower() == "darknet" and str(model_name).lower() == "yolov3":
             return DarknetCoach(
                 model_name=model_name,
                 name=name,
+                enable_training=enable_training,
                 train_ratio=train_ratio,
                 classes=classes,
                 generate_custom_anchors=generate_custom_anchors,
@@ -118,31 +122,17 @@ class CoachFactory(object):
                 learning_rate_yolov3 = learning_rate_yolov3
             )
         elif str(framework).lower() == "darknet" and str(model_name).lower() == "yolov4":
-            generate_custom_anchors: bool = train_config.get("model").get(
-                "generate_custom_anchors", False
-            )
-            angle: int = train_config.get("model").get("angle", 0)
-            saturation: float = train_config.get("model").get("saturation", 1.5)
-            exposure: float = train_config.get("model").get("exposure", 1.5)
-            hue: float = train_config.get("model").get("hue", 0.1)
-            calculate_map: bool = train_config.get("training").get(
-                "calculate_map", True
-            )
-            web_ui_el = train_config.get("training").get(
-                "web_ui", {"enable": False, "port": 8090}
-            )
-            web_ui: bool = web_ui_el["enable"]
-            web_ui_port: int = web_ui_el["port"]
-
             return DarknetCoachV4(
                 model_name=model_name,
                 name=name,
+                enable_training=enable_training,
                 train_ratio=train_ratio,
                 classes=classes,
                 generate_custom_anchors=generate_custom_anchors,
                 batch_size=batch_size,
                 max_batches=max_batches,
                 subdivisions=subdivisions,
+                channels=channels,
                 image_width=image_width,
                 image_height=image_height,
                 angle=angle,
