@@ -277,6 +277,7 @@ class DarknetCoachV4(Coach):
                     classes_nb=len(self._classes),
                     batch_size=self._batch_size,
                     subdivisions=self._subdivisons,
+                    channels=self._channels,
                     max_batches=self._max_batches,
                     image_width=self._image_width,
                     image_height=self._image_height,

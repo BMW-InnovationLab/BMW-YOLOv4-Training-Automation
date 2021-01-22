@@ -2,9 +2,11 @@ name: docker-build
 
 on:
   push:
-    branches: [ master ]
+    branches:
+      - '**'
   pull_request:
-    branches: [ master ]
+    branches:
+      - '**'
 
   workflow_dispatch:
 
@@ -12,13 +14,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
+
     - name: Install dependencies
       run: scripts/install_docker.sh && scripts/install_dependencies.sh
-
-    - uses: actions/checkout@v2
 
     - name: Build
       run: ./build_docker.sh
 
     - name: Launch
-      run: ./launch_docker.sh
+      run: ./launch_docker.sh --test-darknet
