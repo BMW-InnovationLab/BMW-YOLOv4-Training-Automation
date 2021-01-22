@@ -2,7 +2,7 @@ folder_path="$(pwd)/dataset"
 container_name="yolov4-midgard"
 configfile=$folder_path/train_config.json
 ports=''
-interactive_options='-it'
+interactive_options='--gpus all -it --runtime=nvidia'
 
 COMMAND="/bin/bash"
 
@@ -45,7 +45,7 @@ if [ -f $configfile ]; then
 		ports="$ports -p $web_ui_port:$web_ui_port"
 	fi
 
-	docker run  --gpus all --rm --runtime=nvidia \
+	docker run  --rm \
 				$interactive_options \
 				-e TRAIN_NAME=$container_name \
 				-e TRAIN_START_TIME="$(date '+%Y%m%d_%H:%M:%S')" \
