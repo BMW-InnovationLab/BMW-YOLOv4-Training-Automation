@@ -3,6 +3,29 @@ container_name="yolov4-midgard"
 configfile=$folder_path/train_config.json
 ports=''
 
+COMMAND="/bin/bash"
+
+while test $# -gt 0
+do
+    case "$1" in
+        --run) COMMAND="python3 main.py"
+            ;;
+        --inference)
+			set="$2"
+			input="$3"
+			training_set="/training/custom_training/$set"
+			COMMAND="/training/darknet/darknet detector test $training_set/config/obj.data $training_set/config/yolo4.cfg $training_set/weights/yolo4_best.weights $input"
+			shift
+			shift
+            ;;
+		--test-darknet)
+			COMMAND="ls /training/darknet/darknet"
+			;;
+    esac
+    shift
+done
+
+
 if [ -f $configfile ]; then
 	custom_api=`jq .training.custom_api.enable $configfile`
 	if [ "$custom_api" = "true" ]; then
@@ -22,14 +45,15 @@ if [ -f $configfile ]; then
 
 	docker run  --gpus all --rm --runtime=nvidia -it \
 				-e TRAIN_NAME=$container_name \
-				-e TRAIN_START_TIME="$(date '+%Y%m%d_%H:%M:%S')" $ports \
+				-e TRAIN_START_TIME="$(date '+%Y%m%d_%H:%M:%S')" \
 				-v $folder_path:/training/assets \
 				-v $(pwd)/trainings:/training/custom_training \
 				-v /etc/timezone:/etc/timezone:ro \
 				-v /etc/localtime:/etc/localtime:ro \
 				--name $container_name \
+				$ports \
 				$USER/yolov4:latest \
-				python3 src/main.py
+				$COMMAND
 else
 	echo "Error: Configuration file not found in the provided path"
 fi
