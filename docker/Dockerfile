@@ -26,7 +26,8 @@ RUN apt-get update && \
 RUN apt-get update && apt-get install -y python3-pip python3.6-dev
 
 # Install all needed python librarires
-RUN pip3 install -r ./docker/requirements.txt
+COPY ./docker/requirements.txt .
+RUN pip3 install -r requirements.txt
 
 # Create working directory
 WORKDIR /training
