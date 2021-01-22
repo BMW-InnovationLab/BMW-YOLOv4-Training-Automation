@@ -1,4 +1,5 @@
 # YOLOv4-v3 Training Automation API for Linux
+![test](https://github.com/evroon/yolov4/workflows/docker-build/badge.svg)
 
 This project is forked from [BMW-YOLOv4-Training-Automation](https://github.com/BMW-InnovationLab/BMW-YOLOv4-Training-Automation).
 
@@ -9,6 +10,18 @@ You can also use our BMW-Labeltool-lite to label your dataset with yolo labels f
 
 
 ![](swagger_yolo_training.png)
+
+## Quickstart
+
+All the commands should need to train a dataset are:
+
+```bash
+scripts/install_dependencies.sh
+./build_docker.sh
+./launch_docker.sh
+```
+
+See the following sections for more information.
 
 ## Prerequisites
 
