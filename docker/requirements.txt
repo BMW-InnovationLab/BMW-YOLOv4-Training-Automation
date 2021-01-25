@@ -16,3 +16,4 @@ tb-nightly==1.15.0a20190813
 tensorboardX==1.8
 tqdm==4.33.0
 uvicorn==0.8.6
+email-validator

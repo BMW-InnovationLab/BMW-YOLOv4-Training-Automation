@@ -5,7 +5,7 @@ from exception_utils import *
 
 
 class CoachFactory(object):
-    def init_coach_from_config(self, train_config_path: str) -> Coach:
+    def init_coach_from_config(self, train_config_path: str, enable_training=False) -> Coach:
         if not Path(train_config_path).exists():
             raise ConfigError(
                 "train_config.json", "Configuration file was not provided"
@@ -27,8 +27,6 @@ class CoachFactory(object):
         image_height: int = train_config.get("model").get("train_image_height", 416)
         max_batches: int = train_config.get("model").get("max_batches", None)
         learning_rate_yolov3 : float = train_config.get("model").get("yolov3_config").get("learning_rate", 0.001)
-
-        enable_training = False
 
         # modification by hadi to get yolov4 specific variable of data augmentation
         learning_rate_yolov4 : float = train_config.get("model").get("yolov4_config").get("learning_rate",0.0013)

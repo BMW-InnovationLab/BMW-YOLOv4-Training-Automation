@@ -363,15 +363,16 @@ class DarknetCoach(Coach):
         os.symlink(
             self._working_dir / "darknet/data/labels", self._working_dir / "data/labels"
         )
+        print(
+            "\nYou can now monitor the training using any of the provided means or by viewing the logs saved in the custom training folder\n"
+        )
 
         update_arg(self._tensorboard, self._working_dir)
         self._logger.info("Starting YOLO training")
         process: subprocess.Popen = subprocess.Popen(
             command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
         )
-        print(
-            "\nYou can now monitor the training using any of the provided means or by viewing the logs saved in the custom training folder\n"
-        )
+
         pid_path = self._working_dir / "pid.txt"
         with open(pid_path, "w+") as pid:
             pid.write(str(process.pid))

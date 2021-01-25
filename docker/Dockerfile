@@ -5,7 +5,7 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 
 ARG GPU=1
 ARG CUDNN=1
-ARG CUDNN_HALF=1
+ARG CUDNN_HALF=0
 ARG OPENCV=1
 ARG OPENMP=0
 

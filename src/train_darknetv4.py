@@ -4,6 +4,8 @@ import socket
 import shutil
 import logging
 import subprocess
+import time
+
 
 from train import Coach
 from pathlib import Path
@@ -331,7 +333,7 @@ class DarknetCoachV4(Coach):
                 subprocess.Popen(
                     [
                         "uvicorn",
-                        "api:app",
+                        "src.api:app",
                         "--host",
                         "0.0.0.0",
                         "--port",
@@ -347,7 +349,7 @@ class DarknetCoachV4(Coach):
             )
             with open(os.devnull, "w") as DEVNULL:
                 subprocess.Popen(
-                    ["tensorboard", "--logdir", "./runs","--port", str(self._tensorboard_port)], stderr=DEVNULL, stdout=DEVNULL
+                    ["tensorboard", "--logdir", "./runs", "--port", str(self._tensorboard_port)], stderr=DEVNULL, stdout=DEVNULL
                 )
 
         # Create a rotating log
@@ -372,7 +374,7 @@ class DarknetCoachV4(Coach):
         print("\nYou can now monitor the training using any of the provided means or by viewing the logs saved in the custom training folder\n")
 
         if self._enable_training:
-            self.start_process(command)
+            self.start_process(command, yolo_training_logger, yolo_cfg_path)
         else:
             self.infer(yolo_cfg_path)
 
@@ -403,10 +405,11 @@ class DarknetCoachV4(Coach):
                 step += 1
 
         while True:
-            sleep(1)
+            time.sleep(1)
 
-    def start_process(self, command):
+    def start_process(self, command, yolo_training_logger, yolo_cfg_path):
         self._logger.info("Starting YOLO training")
+        print(' '.join(command))
         process: subprocess.Popen = subprocess.Popen(
             command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
         )

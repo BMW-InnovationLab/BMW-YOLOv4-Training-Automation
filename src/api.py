@@ -5,7 +5,7 @@ import numpy as np
 
 from PIL import Image
 from io import BytesIO
-from api_utils import *
+from src.api_utils import *
 from pydantic import BaseModel
 from starlette.responses import FileResponse
 from fastapi import FastAPI, File, HTTPException
