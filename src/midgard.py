@@ -3,7 +3,6 @@ import os
 import shutil
 import cv2
 import numpy as np
-import utils
 from enum import Enum
 
 
@@ -64,8 +63,8 @@ class MidgardConverter:
         with open(ann_path, 'r') as f:
             for line in f.readlines():
                 values = [float(x) for x in line.split(',')]
-                center = np.array([values[1] + values[3] / 2, values[2] + values[4] / 2]) / self.capture_size.astype(np.float)
-                size = np.array([values[3], values[4]]) / (2.0 * self.capture_size.astype(np.float))
+                center = np.array([values[1] + values[3] / 2, values[2] + values[4] / 2]) / self.resolution.astype(np.float)
+                size = np.array([values[3], values[4]]) / (2.0 * self.resolution.astype(np.float))
                 lines.append(f'0 {center[0]} {center[1]} {size[0]} {size[1]}')
 
         return lines
@@ -92,7 +91,7 @@ class MidgardConverter:
         self.channels = channel_options[self.mode]
 
         self.capture_shape = self.get_capture_shape()
-        self.resolution = self.capture_shape.shape[:2][::-1]
+        self.resolution = np.array(self.capture_shape)[:2][::-1]
 
         self.remove_contents_of_folder(self.img_dest_path)
         self.remove_contents_of_folder(self.ann_dest_path)
