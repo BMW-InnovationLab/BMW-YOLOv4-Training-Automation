@@ -93,18 +93,10 @@ class DarknetCoachV4(Coach):
 
         _custom_training_folder_path: Path = self._custom_training_dir / Path(
             os.getenv('TRAIN_NAME') + "_" + os.getenv("TRAIN_START_TIME"))
-        if (os.path.exists(_custom_training_folder_path)):
-            shutil.rmtree(_custom_training_folder_path)
-        self._custom_training_folder_path: Path = _custom_training_folder_path
-        Path.mkdir(_custom_training_folder_path)
 
-        # Create config and weights folders
-        self._logger.info("Creating needed folders: weights and config")
+        self._custom_training_folder_path: Path = _custom_training_folder_path
         self._custom_config_path: Path = self._custom_training_folder_path / "config"
         self._custom_weights_path: Path = self._custom_training_folder_path / "weights"
-
-        Path.mkdir(self._custom_config_path)
-        Path.mkdir(self._custom_weights_path)
 
         with open(self._model2config_path, "r", encoding="utf-8") as convertionReader:
             self._model2config: dict = json.load(convertionReader)
@@ -116,14 +108,25 @@ class DarknetCoachV4(Coach):
                 self._model2config.get("darknet").get(self._model_name).get("weights")
             )
 
-        self._logger.info(
-            "Copying {} file to needed location".format(weights_path.stem)
-        )
-        copy_weights_file(
-            source=weights_path,
-            destination=self._custom_weights_path,
-            weights_name="initial.weights",
-        )
+        if (os.path.exists(_custom_training_folder_path)):
+            self._logger.info('Using existing data directory')
+        else:
+            Path.mkdir(_custom_training_folder_path)
+
+            # Create config and weights folders
+            self._logger.info("Creating needed folders: weights and config")
+
+            Path.mkdir(self._custom_config_path)
+            Path.mkdir(self._custom_weights_path)
+
+            self._logger.info(
+                "Copying {} file to needed location".format(weights_path.stem)
+            )
+            copy_weights_file(
+                source=weights_path,
+                destination=self._custom_weights_path,
+                weights_name="initial.weights",
+            )
 
     def split_train_test(self):
         destination_train_txt_path: Path = self._custom_training_folder_path / "train.txt"
@@ -371,7 +374,7 @@ class DarknetCoachV4(Coach):
 
         update_arg(self._tensorboard, self._working_dir)
 
-        print("\nYou can now monitor the training using any of the provided means or by viewing the logs saved in the custom training folder\n")
+        self._logger.info("You can now monitor the training using any of the provided means or by viewing the logs saved in the custom training folder\n")
 
         if self._enable_training:
             self.start_process(command, yolo_training_logger, yolo_cfg_path)
@@ -396,7 +399,7 @@ class DarknetCoachV4(Coach):
                 weights_path=last_weights_path,
                 image=self._prediction_image,
             )
-            if self._tensorboard:
+            if self._tensorboard and os.path.exists(labeled_prediction_image_path):
                 img: JpegImagePlugin.JpegImageFile = Image.open(
                     labeled_prediction_image_path
                 )
@@ -409,7 +412,7 @@ class DarknetCoachV4(Coach):
 
     def start_process(self, command, yolo_training_logger, yolo_cfg_path):
         self._logger.info("Starting YOLO training")
-        print(' '.join(command))
+
         process: subprocess.Popen = subprocess.Popen(
             command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
         )
