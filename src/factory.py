@@ -28,7 +28,7 @@ class CoachFactory(object):
         max_batches: int = train_config.get("model").get("max_batches", None)
         learning_rate_yolov3 : float = train_config.get("model").get("yolov3_config").get("learning_rate", 0.001)
 
-        enable_training = os.environ['ENABLE_TRAINING'] == 1
+        enable_training = os.environ['ENABLE_TRAINING'] == str(1)
 
         # modification by hadi to get yolov4 specific variable of data augmentation
         learning_rate_yolov4 : float = train_config.get("model").get("yolov4_config").get("learning_rate",0.0013)
