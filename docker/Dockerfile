@@ -53,6 +53,8 @@ RUN \
 	sed -i "s/OPENMP=0/OPENMP=${OPENMP}/" Makefile && \
 	make
 
+RUN sed -i "s/names = data\/coco.names/names = \/training\/darknet\/data\/coco.names/" cfg/coco.data
+
 WORKDIR /training
 
 # Default command

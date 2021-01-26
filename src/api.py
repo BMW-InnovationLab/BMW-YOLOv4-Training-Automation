@@ -207,49 +207,30 @@ async def get_prediction(
 ):
     """Runs the last saved weights to infer on the given image"""
 
-    prediction_path: Path = working_dir / "predictions"
-    training_path: Path = trainn_dir
-    weights_path: Path = training_path / "weights"
-    last_weights: list = list(weights_path.glob("*_last.weights"))
-
-    if not last_weights:
-        result: dict = {
-            "success": True,
-            "start_time": get_time(),
-            "message": "No predictions yet",
-        }
-        return result
-
-    if not prediction_path.exists():
-        # Create folder in working directory symlinked to darknet/data/labels because it is needed by darknet to label the bounding boxes
-        Path.mkdir(prediction_path)
-        os.chdir(prediction_path)
-        os.mkdir(Path("data"))
-        os.symlink(
-            working_dir / "darknet/data/labels", working_dir / "predictions/data/labels"
-        )
     try:
-        img: Image = Image.open(BytesIO(image)).convert("RGB")
-        img.save("image.jpg")
-        config_file_path: Path = training_path / "config"
-        data_path: str = str(list(config_file_path.glob("*.data"))[0])
-        cfg_path: str = str(list(config_file_path.glob("*.cfg"))[0])
-        last_weights: str = str(last_weights[0])
-        darknet_exec_path: Path = working_dir / "darknet/darknet"
-        command: list = [
-            darknet_exec_path,
-            "detector",
-            "test",
-            data_path,
-            cfg_path,
-            last_weights,
-            "-dont_show",
-        ]
-        command.append(str(working_dir / "predictions/image.jpg"))
+        perform_prediction(image, False)
+    except Exception as ex:
+        raise HTTPException(
+            422,
+            detail="Error while reading request image. Please make sure it is a valid image {}".format(
+                str(ex)
+            ),
+        )
 
-        with open(os.devnull, "w") as DEVNULL:
-            subprocess.call(command, stdout=DEVNULL, stderr=DEVNULL)
+    return FileResponse("predictions.jpg", media_type="image/jpg")
 
+@app.post(
+    "/predict_coco",
+    summary="Upload image and get its predictions using last saved weights",
+    tags=["Inference"],
+)
+async def get_prediction_coco(
+    image: bytes = File(..., description="Image to perform inference on")
+):
+    """Runs the last saved weights to infer on the given image"""
+
+    try:
+        perform_prediction(image, True)
     except Exception as ex:
         raise HTTPException(
             422,

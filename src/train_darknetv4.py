@@ -318,8 +318,6 @@ class DarknetCoachV4(Coach):
                         "--port",
                         str(self._custom_api_port),
                     ],
-                    stderr=DEVNULL,
-                    stdout=DEVNULL,
                 )
 
         if self._tensorboard:
