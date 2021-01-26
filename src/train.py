@@ -110,7 +110,12 @@ class Coach(ABC):
 
     # Execute training command
     @abstractmethod
-    def start_training(self) -> None:
+    def find_prediction_image(self) -> None:
+        raise NotImplementedError
+
+    # Execute training command
+    @abstractmethod
+    def start_process(self) -> None:
         raise NotImplementedError
 
     # Template method to execute all needed steps in the correct order
@@ -119,7 +124,11 @@ class Coach(ABC):
         self.check_data()
         self.create_output_files()
         self.split_train_test()
-        self.create_training_files()
-        self.generate_anchors()
-        self.update_config()
-        self.start_training()
+
+        if not self._using_existing_data:
+            self.create_training_files()
+            self.generate_anchors()
+            self.update_config()
+
+        self.find_prediction_image()
+        self.start_process()

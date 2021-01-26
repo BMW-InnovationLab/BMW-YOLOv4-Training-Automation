@@ -191,10 +191,11 @@ class DarknetCoach(Coach):
         self._train_txt_path = destination_train_txt_path
         self._test_txt_path = test_txt_path
 
+    def find_prediction_image(self):
         prediction_image: str = None
-        if test_txt_path:
+        if self._test_txt_path:
             self._logger.info("Choosing an image from test.txt for inference")
-            with open(test_txt_path, "r") as test_txt_file:
+            with open(self._test_txt_path, "r") as test_txt_file:
                 test_images_list: list = test_txt_file.readlines()
                 if test_images_list:
                     prediction_image = test_images_list[0].rstrip()
@@ -292,7 +293,7 @@ class DarknetCoach(Coach):
                 )
             )
 
-    def start_training(self):
+    def start_process(self):
         yolo_cfg_path: str = "{}.cfg".format(
             str(self._custom_config_path / self._model_name)
         )

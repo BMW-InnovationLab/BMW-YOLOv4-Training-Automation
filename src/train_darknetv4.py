@@ -97,6 +97,18 @@ class DarknetCoachV4(Coach):
         self._custom_training_folder_path: Path = _custom_training_folder_path
         self._custom_config_path: Path = self._custom_training_folder_path / "config"
         self._custom_weights_path: Path = self._custom_training_folder_path / "weights"
+        self._using_existing_data: bool = os.path.exists(self._custom_training_folder_path)
+
+        _darknet_dir: Path = self._working_dir / "darknet"
+        _darknet_exec: Path = _darknet_dir / "darknet"
+        self._darknet_exec: str = str(_darknet_exec)
+        self._custom_anchors: str = None
+
+        dot_data: str = "{}.data".format(self._name)
+        dot_names: str = "{}.names".format(self._name)
+
+        self._custom_dot_data_path: Path = self._custom_config_path / dot_data
+        self._custom_dot_names_path: Path = self._custom_config_path / dot_names
 
         with open(self._model2config_path, "r", encoding="utf-8") as convertionReader:
             self._model2config: dict = json.load(convertionReader)
@@ -108,10 +120,14 @@ class DarknetCoachV4(Coach):
                 self._model2config.get("darknet").get(self._model_name).get("weights")
             )
 
-        if (os.path.exists(_custom_training_folder_path)):
+        if (self._using_existing_data):
             self._logger.info('Using existing data directory')
+
+            # Remove unnecessary tensorflow log directory.
+            generated_data_dir = sorted(Path(self._working_dir / 'runs').iterdir(), key=os.path.getmtime)[-1]
+            shutil.rmtree(generated_data_dir)
         else:
-            Path.mkdir(_custom_training_folder_path)
+            Path.mkdir(self._custom_training_folder_path)
 
             # Create config and weights folders
             self._logger.info("Creating needed folders: weights and config")
@@ -194,10 +210,12 @@ class DarknetCoachV4(Coach):
         self._train_txt_path = destination_train_txt_path
         self._test_txt_path = test_txt_path
 
+
+    def find_prediction_image(self):
         prediction_image: str = None
-        if test_txt_path:
+        if self._test_txt_path:
             self._logger.info("Choosing an image from test.txt for inference")
-            with open(test_txt_path, "r") as test_txt_file:
+            with open(self._test_txt_path, "r") as test_txt_file:
                 test_images_list: list = test_txt_file.readlines()
                 if test_images_list:
                     prediction_image = test_images_list[0].rstrip()
@@ -214,35 +232,23 @@ class DarknetCoachV4(Coach):
 
     # Create obj.names and obj.data
     def create_training_files(self):
-        self._logger.info("Creating .data file")
-        dot_data: str = "{}.data".format(self._name)
-        self._logger.info("Creating .names file")
-        dot_names: str = "{}.names".format(self._name)
-        _custom_dot_data_path: Path = self._custom_config_path / dot_data
-        _custom_dot_names_path: Path = self._custom_config_path / dot_names
+        self._logger.info("Creating .data and .names file")
 
-        with open(_custom_dot_names_path, "w", encoding="utf-8") as obj_names_file:
+        with open(self._custom_dot_names_path, "w", encoding="utf-8") as obj_names_file:
             obj_names_file.write(create_obj_names(classes=self._classes))
 
-        with open(_custom_dot_data_path, "w", encoding="utf-8") as obj_data_file:
+        with open(self._custom_dot_data_path, "w", encoding="utf-8") as obj_data_file:
             obj_data_file.write(
                 create_obj_data(
                     classes=self._classes,
                     train_txt_path=self._train_txt_path,
                     test_txt_path=self._test_txt_path,
-                    dot_names_path=_custom_dot_names_path,
+                    dot_names_path=self._custom_dot_names_path,
                     saved_weights_path=self._custom_weights_path,
                 )
             )
 
-        self._custom_dot_data_path: Path = _custom_dot_data_path
-
     def generate_anchors(self):
-        _darknet_dir: Path = self._working_dir / "darknet"
-        _darknet_exec: Path = _darknet_dir / "darknet"
-        self._darknet_exec: str = str(_darknet_exec)
-        self._custom_anchors: str = None
-
         if self._generate_custom_anchors:
             self._logger.info("Recalculating anchors")
             command: list = [
@@ -297,37 +303,7 @@ class DarknetCoachV4(Coach):
                 )
             )
 
-    def start_training(self):
-        yolo_cfg_path: str = "{}.cfg".format(
-            str(self._custom_config_path / self._model_name)
-        )
-        command: list = [
-            self._darknet_exec,
-            "detector",
-            "train",
-            str(self._custom_dot_data_path),
-            yolo_cfg_path,
-            str(self._custom_weights_path / "initial.weights"),
-            "-dont_show",
-            "-clear",
-            "1",
-        ]
-
-        if self._gpus:
-            arg: str = ",".join(str(gpu) for gpu in self._gpus)
-            command.append("-gpus")
-            command.append(arg)
-
-        if self._web_ui:
-            self._logger.info(
-                "Running web_ui on port {}".format(str(self._web_ui_port))
-            )
-            command.append("-mjpeg_port")
-            command.append(str(self._web_ui_port))
-
-        if self._calculate_map:
-            command.append("-map")
-
+    def start_process(self):
         if self._custom_api:
             self._logger.info(
                 "Running YOLO API on port {}".format(str(self._custom_api_port))
@@ -361,6 +337,10 @@ class DarknetCoachV4(Coach):
 
         # Add a rotating handler for yolo training output
         yolo_log_path = self._custom_training_folder_path / "yolo_events.log"
+        yolo_cfg_path: str = "{}.cfg".format(
+            str(self._custom_config_path / self._model_name)
+        )
+
         yolo_handler: RotatingFileHandler = RotatingFileHandler(
             yolo_log_path, maxBytes=51200, backupCount=1
         )
@@ -377,7 +357,7 @@ class DarknetCoachV4(Coach):
         self._logger.info("You can now monitor the training using any of the provided means or by viewing the logs saved in the custom training folder\n")
 
         if self._enable_training:
-            self.start_process(command, yolo_training_logger, yolo_cfg_path)
+            self.start_training(yolo_cfg_path, yolo_training_logger)
         else:
             self.infer(yolo_cfg_path)
 
@@ -410,8 +390,35 @@ class DarknetCoachV4(Coach):
         while True:
             time.sleep(1)
 
-    def start_process(self, command, yolo_training_logger, yolo_cfg_path):
+    def start_training(self, yolo_cfg_path, yolo_training_logger):
         self._logger.info("Starting YOLO training")
+
+        command: list = [
+            self._darknet_exec,
+            "detector",
+            "train",
+            str(self._custom_dot_data_path),
+            yolo_cfg_path,
+            str(self._custom_weights_path / "initial.weights"),
+            "-dont_show",
+            "-clear",
+            "1",
+        ]
+
+        if self._gpus:
+            arg: str = ",".join(str(gpu) for gpu in self._gpus)
+            command.append("-gpus")
+            command.append(arg)
+
+        if self._web_ui:
+            self._logger.info(
+                "Running web_ui on port {}".format(str(self._web_ui_port))
+            )
+            command.append("-mjpeg_port")
+            command.append(str(self._web_ui_port))
+
+        if self._calculate_map:
+            command.append("-map")
 
         process: subprocess.Popen = subprocess.Popen(
             command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT
