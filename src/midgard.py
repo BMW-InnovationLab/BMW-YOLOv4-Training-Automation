@@ -4,6 +4,7 @@ import shutil
 import cv2
 import numpy as np
 from enum import Enum
+import utils
 
 
 class MidgardConverter:
@@ -15,7 +16,12 @@ class MidgardConverter:
         FLOW_UV_NORMALISED = 2,
         FLOW_RADIAL = 3
 
-    def remove_contents_of_folder(self, folder):
+    def remove_contents_of_folder(self, folder: str) -> None:
+        """Remove all content of a directory
+
+        Args:
+            folder (string): the directory to delete
+        """
         for filename in os.listdir(folder):
             file_path = os.path.join(folder, filename)
             try:
@@ -26,14 +32,30 @@ class MidgardConverter:
             except Exception as e:
                 print('Failed to delete %s. Reason: %s' % (file_path, e))
 
-    def get_capture_shape(self):
+    def get_capture_shape(self) -> tuple:
+        """Get the shape of the original image inputs.
+
+        Returns:
+            tuple: image shape
+        """
         return np.array(cv2.imread(f'{self.img_path}/image_00000.png')).shape
 
-    def get_flow_uv(self):
+    def get_flow_uv(self) -> np.ndarray:
+        """Get the content of the .flo file for the current frame
+
+        Returns:
+            np.ndarray: (w, h, 2) array with flow vectors
+        """
         flo_path = f'{self.img_path}/output/inference/run.epoch-0-flow-field/{self.i:06d}.flo'
         return utils.read_flow(flo_path)
 
-    def process_image(self, src, dst):
+    def process_image(self, src: str, dst: str) -> None:
+        """Processes an image of the dataset and places it in the target directory
+
+        Args:
+            src (str): source image path
+            dst (str): destination image path
+        """
         if self.mode == MidgardConverter.Mode.APPEARANCE_RGB:
             shutil.copy2(src, dst)
         else:
@@ -42,12 +64,26 @@ class MidgardConverter:
 
             if self.mode == MidgardConverter.Mode.FLOW_UV:
                 cv2.imwrite(dst, img)
+            elif self.mode == MidgardConverter.Mode.FLOW_UV:
+                img = np.zeros()
+                cv2.imwrite(dst, img)
 
-    def process_annot(self, src, dst):
+    def process_annot(self, src: str, dst: str) -> None:
+        """Processes an annotation file of the dataset and places it in the target directory
+
+        Args:
+            src (str): source annotation file path
+            dst (str): destination annotation file path
+        """
         with open(dst, 'w') as f:
             f.writelines(self.get_midgard_annotation(src))
 
-    def prepare_sequence(self, sequence):
+    def prepare_sequence(self, sequence: str) -> None:
+        """Prepare a sequence of the MIDGARD dataset
+
+        Args:
+            sequence (str): which sequence to prepare, for example 'indoor-modern/sports-hall'
+        """
         images = glob.glob(f'{self.img_path}/*.png')
         annotations = glob.glob(f'{self.ann_path}/*.csv')
         images.sort()
@@ -57,7 +93,15 @@ class MidgardConverter:
             self.process_image(img_src, f'{self.img_dest_path}/{i:06d}.png')
             self.process_annot(ann_src, f'{self.ann_dest_path}/{i:06d}.txt')
 
-    def get_midgard_annotation(self, ann_path):
+    def get_midgard_annotation(self, ann_path: str) -> list:
+        """Returns a list of ground truth bounding boxes given an annotation file.
+
+        Args:
+            ann_path (str): the annotation .txt file to process
+
+        Returns:
+            list: a list of bounding boxes in format '0 {center_x} {center_y} {size_x} {size_y}' with coordinates in range [0, 1]
+        """
         lines = []
 
         with open(ann_path, 'r') as f:
@@ -69,7 +113,8 @@ class MidgardConverter:
 
         return lines
 
-    def process(self):
+    def process(self) -> None:
+        """Processes the MIDGARD dataset"""
         channel_options = {
             MidgardConverter.Mode.APPEARANCE_RGB: 3,
             MidgardConverter.Mode.FLOW_UV: 2,
