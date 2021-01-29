@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from enum import Enum
 import utils
+import flow_vis
 
 
 class MidgardConverter:
@@ -49,6 +50,17 @@ class MidgardConverter:
         flo_path = f'{self.img_path}/output/inference/run.epoch-0-flow-field/{self.i:06d}.flo'
         return utils.read_flow(flo_path)
 
+    def get_flow_vis(self, frame: np.ndarray) -> np.ndarray:
+        """Visualize a flow field array
+
+        Args:
+            frame (np.ndarray): the raw flow field (w, h, 2)
+
+        Returns:
+            np.ndarray: BGR flow field visualized in HSV space
+        """
+        return flow_vis.flow_to_color(frame, convert_to_bgr=True)
+
     def process_image(self, src: str, dst: str) -> None:
         """Processes an image of the dataset and places it in the target directory
 
@@ -60,13 +72,14 @@ class MidgardConverter:
             shutil.copy2(src, dst)
         else:
             img = cv2.imread(src)
-            img = cv2.resize(img, self.capture_shape)
+
+            if img.shape != self.capture_shape:
+                img = cv2.resize(img, self.capture_shape)
 
             if self.mode == MidgardConverter.Mode.FLOW_UV:
-                cv2.imwrite(dst, img)
-            elif self.mode == MidgardConverter.Mode.FLOW_UV:
-                img = np.zeros()
-                cv2.imwrite(dst, img)
+                flow_uv = self.get_flow_uv()
+                flow_vis = self.get_flow_vis(flow_uv)
+                cv2.imwrite(dst, flow_vis)
 
     def process_annot(self, src: str, dst: str) -> None:
         """Processes an annotation file of the dataset and places it in the target directory
@@ -84,14 +97,34 @@ class MidgardConverter:
         Args:
             sequence (str): which sequence to prepare, for example 'indoor-modern/sports-hall'
         """
+        print(f'Preparing sequence {sequence}')
+        self.sequence = sequence
+        self.img_path = f'{self.midgard_path}/{self.sequence}/images'
+        self.flo_path = f'{self.img_path}/output/inference/run.epoch-0-flow-field'
+        self.ann_path = f'{self.midgard_path}/{self.sequence}/annotation'
+
+        self.capture_shape = self.get_capture_shape()
+        self.resolution = np.array(self.capture_shape)[:2][::-1]
+
         images = glob.glob(f'{self.img_path}/*.png')
         annotations = glob.glob(f'{self.ann_path}/*.csv')
+        flow_fields = glob.glob(f'{self.flo_path}/*.flo')
         images.sort()
         annotations.sort()
 
+        self.i = 0
+        self.N = len(images)
+
+        if len(images) != len(annotations) or len(images) - 1 != len(flow_fields):
+            print('Input counts: (images, annotations, flow fields):', len(images), len(annotations), len(flow_fields))
+            raise ValueError('Input sizes do not match.')
+
         for i, (img_src, ann_src) in enumerate(zip(images, annotations)):
-            self.process_image(img_src, f'{self.img_dest_path}/{i:06d}.png')
-            self.process_annot(ann_src, f'{self.ann_dest_path}/{i:06d}.txt')
+            # Skip the last frame for optical flow inputs, as it does not exist.
+            if not (self.mode != MidgardConverter.Mode.APPEARANCE_RGB and self.i >= self.N - 2):
+                self.i = i
+                self.process_image(img_src, f'{self.img_dest_path}/{i:06d}.png')
+                self.process_annot(ann_src, f'{self.ann_dest_path}/{i:06d}.txt')
 
     def get_midgard_annotation(self, ann_path: str) -> list:
         """Returns a list of ground truth bounding boxes given an annotation file.
@@ -126,23 +159,28 @@ class MidgardConverter:
         self.dest_path = 'dataset'
         self.img_dest_path = f'{self.dest_path}/images'
         self.ann_dest_path = f'{self.dest_path}/labels/yolo'
-        self.sequence = 'indoor-modern/sports-hall'
-
-        self.img_path = f'{self.midgard_path}/{self.sequence}/images'
-        self.flo_path = f'{self.img_path}/output/inference/run.epoch-0-flow-field'
-        self.ann_path = f'{self.midgard_path}/{self.sequence}/annotation'
+        sequences = [
+            'indoor-historical/stairwell',
+            'indoor-modern/sports-hall',
+            'indoor-historical/church',
+            'semi-urban/island-north',
+            'semi-urban/island-south',
+            'countryside-natural/north-narrow',
+            'countryside-natural/south-narrow',
+        ]
 
         self.mode = MidgardConverter.Mode.APPEARANCE_RGB
         self.channels = channel_options[self.mode]
 
-        self.capture_shape = self.get_capture_shape()
-        self.resolution = np.array(self.capture_shape)[:2][::-1]
-
         self.remove_contents_of_folder(self.img_dest_path)
         self.remove_contents_of_folder(self.ann_dest_path)
 
-        self.prepare_sequence(self.sequence)
+        print(f'Mode: {self.mode}')
+
+        for sequence in sequences:
+            self.prepare_sequence(sequence)
 
 
 converter = MidgardConverter()
 converter.process()
+print('finished')
