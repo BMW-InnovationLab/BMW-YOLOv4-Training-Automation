@@ -18,7 +18,7 @@ do
 			set="$2"
 			input="$3"
 			training_set="/training/custom_training/$set"
-			COMMAND="/training/darknet/darknet detector test $training_set/config/obj.data $training_set/config/yolo4.cfg $training_set/weights/yolo4_best.weights $input"
+			COMMAND="/training/darknet/darknet detector test $training_set/config/obj.data $training_set/config/yolov4.cfg $training_set/weights/yolo4_best.weights $input"
 			shift
 			shift
             ;;
@@ -27,6 +27,7 @@ do
 			interactive_options=''
 			;;
 		--inference-only)
+			COMMAND="python3 src/main.py"
 			enable_training=0
 			run="$2"
 			shift
