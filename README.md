@@ -195,7 +195,8 @@ Issue related to darknet itself can be filed in [the correct repo](https://githu
 - If during training you see nan values for avg (loss) field - then training goes wrong, but if nan is in some other lines - then training goes well.
 - If error Out of memory occurs then you should try increasing subdivisions to 16, 32 or 64 or have a smaller image size.
 - If training finishes immediately without any error you should decrease batch size and subdivisions.
-- if training on multiple GPU produce nan try decreasing the learning rate to 0,00065
+- If training on multiple GPU produce nan try decreasing the learning rate to 0,00065
+- If your PC suspended and you get errors such as ```./src/utils.c:326: error: Assertion `0' failed.```, rebooting the PC will solve the problem.
 
 
 ## Acknowledgements
