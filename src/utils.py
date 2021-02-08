@@ -64,7 +64,7 @@ def get_output(filename, capture=None, capture_size=None, is_grey=False):
     if capture_size is None:
         capture_size = get_capture_size(capture)
 
-    return cv2.VideoWriter(path, fourcc, 30.0, capture_size, not is_grey)
+    return cv2.VideoWriter(path, fourcc, 30, capture_size, not is_grey)
 
 def get_sequence_length(path):
     return count_dir(path)

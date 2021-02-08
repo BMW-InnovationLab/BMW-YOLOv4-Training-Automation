@@ -8,7 +8,7 @@ from io import BytesIO
 from src.api_utils import *
 from pydantic import BaseModel
 from starlette.responses import FileResponse
-from fastapi import FastAPI, File, HTTPException
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from starlette.middleware.cors import CORSMiddleware
 
 status_path: Path = working_dir / "status.txt"
@@ -198,45 +198,55 @@ def get_validation():
 
 
 @app.post(
-    "/predict",
-    summary="Upload image and get its predictions using last saved weights",
+    "/predict_video",
+    summary="Upload video and get its predictions using last saved weights",
     tags=["Inference"],
 )
-async def get_prediction(
-    image: bytes = File(..., description="Image to perform inference on")
+async def get_prediction_video(
+    video: UploadFile = File(..., description="Video to perform inference on", content_type='video/mp4'),
+    use_default_weights: bool = False
 ):
     """Runs the last saved weights to infer on the given image"""
 
     try:
-        perform_prediction(image, False)
+        result = perform_prediction(video, use_default_weights, True)
     except Exception as ex:
         raise HTTPException(
             422,
-            detail="Error while reading request image. Please make sure it is a valid image {}".format(
-                str(ex)
-            ),
+            detail=f"Error while reading request image. Please make sure it is a valid image. Error: {ex}",
         )
 
-    return FileResponse("predictions.jpg", media_type="image/jpg")
+    if 'output_path' in result:
+        if not os.path.exists(result['output_path']):
+            return {'error': 'No output generated.'}
+
+        return FileResponse(result['output_path'], media_type="video/mp4")
+
+    return result
 
 @app.post(
-    "/predict_coco",
+    "/predict_image",
     summary="Upload image and get its predictions using last saved weights",
     tags=["Inference"],
 )
-async def get_prediction_coco(
-    image: bytes = File(..., description="Image to perform inference on")
+async def get_prediction_image(
+    image: bytes = File(..., description="Image to perform inference on"),
+    use_default_weights: bool = False
 ):
     """Runs the last saved weights to infer on the given image"""
 
     try:
-        perform_prediction(image, True)
+        result = perform_prediction(image, use_default_weights, False)
     except Exception as ex:
         raise HTTPException(
             422,
-            detail="Error while reading request image. Please make sure it is a valid image {}".format(
-                str(ex)
-            ),
+            detail=f"Error while reading request image. Please make sure it is a valid image. Error: {ex}",
         )
 
-    return FileResponse("predictions.jpg", media_type="image/jpg")
+    if 'output_path' in result:
+        if not os.path.exists(result['output_path']):
+            return {'error': 'No output generated.'}
+
+        return FileResponse(result['output_path'], media_type="image/jpg")
+
+    return result

@@ -4,7 +4,7 @@ from starlette.responses import JSONResponse
 from PIL import Image
 import subprocess
 from io import BytesIO
-
+import shutil
 
 working_dir: Path = Path.cwd()
 trainn_dir: Path = working_dir / "custom_training" / Path(os.getenv('TRAIN_NAME') + "_" + os.getenv("TRAIN_START_TIME"))
@@ -54,7 +54,7 @@ def check_error() -> any:
     return False
 
 
-def perform_prediction(image: bytes, use_default_weights: bool) -> None:
+def perform_prediction(image, use_default_weights: bool, is_video: bool) -> dict:
     """Runs the last saved weights to infer on the given image.
 
     Args:
@@ -62,7 +62,7 @@ def perform_prediction(image: bytes, use_default_weights: bool) -> None:
         use_default_weights (bool): whether to use the default YOLOv4 weights
 
     Returns:
-        None
+        dict
     """
 
     prediction_path: Path = working_dir / "predictions"
@@ -87,8 +87,17 @@ def perform_prediction(image: bytes, use_default_weights: bool) -> None:
             working_dir / "darknet/data/labels", working_dir / "predictions/data/labels"
         )
 
-    img: Image = Image.open(BytesIO(image)).convert("RGB")
-    img.save("image.jpg")
+    if is_video:
+        input_path: str = str(working_dir / "predictions/video.mp4")
+        output_path = str(prediction_path / "video_out.mp4")
+        with open(input_path, "wb") as buffer:
+            shutil.copyfileobj(image.file, buffer)
+    else:
+        img: Image = Image.open(BytesIO(image)).convert("RGB")
+        img.save("image.jpg")
+        input_path  = str(working_dir / "predictions/image.jpg")
+        output_path = 'predictions.jpg'
+
     config_file_path: Path = training_path / "config"
     data_path: str = str(list(config_file_path.glob("*.data"))[0])
     cfg_path: str = str(list(config_file_path.glob("*.cfg"))[0])
@@ -103,16 +112,21 @@ def perform_prediction(image: bytes, use_default_weights: bool) -> None:
     command: list = [
         darknet_exec_path,
         'detector',
-        'test',
+        'demo' if is_video else 'test',
         data_path,
         cfg_path,
         last_weights,
         '-dont_show',
+        input_path
     ]
-    command.append(str(working_dir / "predictions/image.jpg"))
+    if is_video:
+        command.append('-out_filename')
+        command.append(output_path)
 
     with open(os.devnull, "w") as DEVNULL:
-        subprocess.call(command, stdout=DEVNULL, stderr=DEVNULL)
+        subprocess.call(command)
+
+    return {'output_path': output_path}
 
 def get_time():
     return os.environ["TRAIN_START_TIME"]
