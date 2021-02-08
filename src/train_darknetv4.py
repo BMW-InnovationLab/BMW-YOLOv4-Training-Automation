@@ -91,10 +91,12 @@ class DarknetCoachV4(Coach):
         # Create custom_folder ex: hello00_20190822:15:26:20
         self._logger.info("Creating your training folder")
 
-        _custom_training_folder_path: Path = self._custom_training_dir / Path(
+        self._custom_training_folder_path: Path = self._custom_training_dir / Path(
             os.getenv('TRAIN_NAME') + "_" + os.getenv("TRAIN_START_TIME"))
 
-        self._custom_training_folder_path: Path = _custom_training_folder_path
+        if not os.path.exists(self._custom_training_folder_path):
+            self._logger.error(f'Could not find training directory: {self._custom_training_folder_path}')
+
         self._custom_config_path: Path = self._custom_training_folder_path / "config"
         self._custom_weights_path: Path = self._custom_training_folder_path / "weights"
         self._using_existing_data: bool = os.path.exists(self._custom_training_folder_path)
