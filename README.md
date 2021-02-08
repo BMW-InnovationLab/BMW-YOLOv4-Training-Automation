@@ -3,7 +3,7 @@
 
 This project is forked from [BMW-YOLOv4-Training-Automation](https://github.com/BMW-InnovationLab/BMW-YOLOv4-Training-Automation).
 
-This repository, based on AlexeyAB's [darknet repo](https://github.com/AlexeyAB), allows you to get started with training a state-of-the-art Deep Learning model with little to no configuration needed!  You provide your labeled dataset and you can start the training right away and monitor it in many different ways like TensorBoard or a custom REST API and GUI. Training with YOLOv4  has never been so easy.
+This repository, based on AlexeyAB's [darknet repo](https://github.com/AlexeyAB/darknet), allows you to get started with training a state-of-the-art Deep Learning model with little to no configuration needed!  You provide your labeled dataset and you can start the training right away and monitor it in many different ways like TensorBoard or a custom REST API and GUI. Training with YOLOv4  has never been so easy.
 This repository has also cross compatibility with Yolov3 training.
 
 You can also use our BMW-Labeltool-lite to label your dataset with yolo labels format https://github.com/BMW-InnovationLab/BMW-Labeltool-Lite.git
