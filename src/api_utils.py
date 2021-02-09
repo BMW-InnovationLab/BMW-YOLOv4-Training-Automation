@@ -124,7 +124,7 @@ def perform_prediction(image, use_default_weights: bool, is_video: bool) -> dict
         command.append(output_path)
 
     with open(os.devnull, "w") as DEVNULL:
-        subprocess.call(command)
+        subprocess.call(command, stdout=DEVNULL, stderr=DEVNULL)
 
     return {'output_path': output_path}
 
