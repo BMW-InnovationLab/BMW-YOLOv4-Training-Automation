@@ -5,6 +5,7 @@ from PIL import Image
 import subprocess
 from io import BytesIO
 import shutil
+import re
 
 working_dir: Path = Path.cwd()
 trainn_dir: Path = working_dir / "custom_training" / Path(os.getenv('TRAIN_NAME') + "_" + os.getenv("TRAIN_START_TIME"))
@@ -84,7 +85,7 @@ def perform_prediction(image, use_default_weights: bool, is_video: bool) -> dict
         os.chdir(prediction_path)
         os.mkdir(Path("data"))
         os.symlink(
-            working_dir / "darknet/data/labels", working_dir / "predictions/data/labels"
+            working_dir / "darknet/data/labels", prediction_path / "data/labels"
         )
 
     if is_video:
@@ -120,13 +121,53 @@ def perform_prediction(image, use_default_weights: bool, is_video: bool) -> dict
         input_path
     ]
     if is_video:
+        command.append('-ext_output')
         command.append('-out_filename')
         command.append(output_path)
 
-    with open(os.devnull, "w") as DEVNULL:
-        subprocess.call(command, stdout=DEVNULL, stderr=DEVNULL)
+    with open(str(prediction_path / 'darknet_prediction.out'), "w") as out_log:
+        with open(str(prediction_path / 'darknet_prediction.err'), "w") as err_log:
+            subprocess.call(command, stdout=out_log, stderr=err_log)
 
     return {'output_path': output_path}
 
 def get_time():
     return os.environ["TRAIN_START_TIME"]
+
+def get_bb_results() -> dict:
+    """Gives a dictionary of bounding boxes for each frame of the last predicted video
+
+    Returns:
+        dict: dict in form {0: 'aeroplane confidence left_x top_y width height', ...} in pixel coordinates
+    """
+    prediction_path: Path = working_dir / "predictions"
+    with open(str(prediction_path / 'darknet_prediction.out'), "r") as out_log:
+        input = out_log.readlines()
+        lines = ''.join(input)
+        matches = re.findall(
+            '^(.+): (.+)[%].+left_x: [ ]+([0-9]+)[ ]+top_y:[ ]+([0-9]+)[ ]+width:[ ]+([0-9]+)[ ]+height:[ ]+([0-9]+)[)]$',
+            lines,
+            flags=re.MULTILINE
+        )
+        indices = [i for i, x in enumerate(input) if x == 'Objects:\n']
+        frame_id, box_id = 1, 0
+        result = dict()
+
+        # Match the boxes with the frames.
+        while frame_id < len(indices):
+            box_count = indices[frame_id] - indices[frame_id-1] - 6
+            result[frame_id] = []
+
+            if box_count > 0:
+                for _ in range(box_count):
+                    result[frame_id].append(' '.join(matches[box_id]))
+                    box_id += 1
+
+            frame_id += 1
+
+        # Add remaining matches to last frame.
+        result[frame_id] = []
+        for box_id in range(box_id, len(matches)):
+            result[frame_id].append(' '.join(matches[box_id]))
+
+        return result

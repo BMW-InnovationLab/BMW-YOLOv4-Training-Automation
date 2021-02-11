@@ -51,10 +51,9 @@ def get_summary() -> dict:
     if result:
         return result
 
-    if not Path(summary_path).exists():
-        summary: list = []
+    summary: list = []
 
-    else:
+    if Path(status_path).exists():
         with open(summary_path, "r") as summaryReader:
             summary: list = summaryReader.readlines()[-1]
             summary = json.loads(summary)
@@ -77,11 +76,9 @@ def get_history_summary() -> dict:
     if result:
         return result
 
-    if not Path(summary_path).exists():
-        summaries: list = []
+    summaries: list = []
 
-    else:
-
+    if Path(status_path).exists():
         with open(summary_path, "r") as summaryReader:
             lines: list = summaryReader.readlines()
             summaries: list = [json.loads(summary) for summary in lines]
@@ -108,10 +105,9 @@ def get_status() -> dict:
     if result:
         return result
 
-    if not Path(status_path).exists():
-        status: list = []
+    status: list = []
 
-    else:
+    if Path(status_path).exists():
         with open(status_path, "r") as statusReader:
             status: str = statusReader.readlines()[-1]
             status: list = json.loads(status)
@@ -134,11 +130,9 @@ def get_history_status() -> dict:
     if result:
         return result
 
-    if not Path(status_path).exists():
-        statuses: list = []
+    statuses: list = []
 
-    else:
-
+    if Path(status_path).exists():
         with open(status_path, "r") as statusReader:
             lines: list = statusReader.readlines()
             statuses: list = [json.loads(status) for status in lines]
@@ -187,14 +181,13 @@ def get_validation():
 
         return FileResponse(collage_path, media_type="image/jpg")
 
-    else:
-        if ground_truth_image_path.exists():
-            message: str = "No predictions yet"
-        else:
-            message: str = "No testing set was provided"
+    message: str = "No testing set was provided"
 
-        result: dict = {"success": True, "start_time": get_time(), "message": message}
-        return result
+    if ground_truth_image_path.exists():
+        message: str = "No predictions yet"
+
+    result: dict = {"success": True, "start_time": get_time(), "message": message}
+    return result
 
 
 @app.post(
@@ -250,3 +243,12 @@ async def get_prediction_image(
         return FileResponse(result['output_path'], media_type="image/jpg")
 
     return result
+
+@app.get(
+    "/predict_video_boxes",
+    summary="Upload video and get its predictions using last saved weights",
+    tags=["Inference"],
+)
+async def get_prediction_video_boxes():
+    """Runs the last saved weights to infer on the given image"""
+    return get_bb_results()

@@ -14,14 +14,6 @@ do
     case "$1" in
         --run) COMMAND="python3 src/main.py"
             ;;
-        --inference)
-			set="$2"
-			input="$3"
-			training_set="/training/custom_training/$set"
-			COMMAND="/training/darknet/darknet detector test $training_set/config/obj.data $training_set/config/yolov4.cfg $training_set/weights/yolo4_best.weights $input"
-			shift
-			shift
-            ;;
 		--test-darknet)
 			COMMAND="ls /training/darknet/darknet"
 			interactive_options=''

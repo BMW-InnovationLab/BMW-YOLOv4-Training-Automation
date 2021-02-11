@@ -349,9 +349,7 @@ def draw_bb(image: str, classes: list, destination: Path) -> None:
         (255, 255, 255),
     ]
 
-    labelsName: list = classes
-
-    detections_path: str = "{}.txt".format(str(Path(image).with_suffix("")))
+    detections_path: str = str(Path(image).with_suffix('.txt'))
     with open(detections_path, "r", encoding="utf-8") as detectionsReader:
         detections: list = detectionsReader.readlines()
 
@@ -363,7 +361,7 @@ def draw_bb(image: str, classes: list, destination: Path) -> None:
             w *= image_width
             h *= image_height
             text_size: tuple = cv2.getTextSize(
-                labelsName[labelId].rstrip(), font, font_scale, thickness
+                classes[labelId].rstrip(), font, font_scale, thickness
             )
             (text_width, text_height) = text_size[0]
             color: tuple = colors[labelId % len(colors)]
@@ -385,7 +383,7 @@ def draw_bb(image: str, classes: list, destination: Path) -> None:
                 )
                 cv2.putText(
                     img,
-                    labelsName[labelId].rstrip(),
+                    classes[labelId].rstrip(),
                     (int(x - (w / 2)), int(y - (h / 2) + text_height + 3)),
                     font,
                     font_scale,
@@ -401,7 +399,7 @@ def draw_bb(image: str, classes: list, destination: Path) -> None:
                 )
                 cv2.putText(
                     img,
-                    labelsName[labelId].rstrip(),
+                    classes[labelId].rstrip(),
                     (int(x - (w / 2)), int(y - (h / 2) - 3)),
                     font,
                     font_scale,

@@ -11,7 +11,7 @@ class CoachFactory(object):
                 "train_config.json", "Configuration file was not provided"
             )
 
-        with open(train_config_path, "r", encoding="utf-8") as yolo_train_config_file:
+        with open(train_config_path, 'r', encoding="utf-8") as yolo_train_config_file:
             train_config: dict = json.load(yolo_train_config_file)
 
         # TODO add JSON Schema validation because this is bad
