@@ -145,7 +145,7 @@ def get_bb_results() -> dict:
         input = out_log.readlines()
         lines = ''.join(input)
         matches = re.findall(
-            '^(.+): (.+)[%].+left_x: [ ]+([0-9]+)[ ]+top_y:[ ]+([0-9]+)[ ]+width:[ ]+([0-9]+)[ ]+height:[ ]+([0-9]+)[)]$',
+            '^([a-zA-z0-9]+): ([0-9]+)[%].+left_x: [ ]+([0-9]+)[ ]+top_y:[ ]+([0-9]+)[ ]+width:[ ]+([0-9]+)[ ]+height:[ ]+([0-9]+)[)]$',
             lines,
             flags=re.MULTILINE
         )
