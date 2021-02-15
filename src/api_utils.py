@@ -6,6 +6,7 @@ import subprocess
 from io import BytesIO
 import shutil
 import re
+from typing import Any
 
 working_dir: Path = Path.cwd()
 trainn_dir: Path = working_dir / "custom_training" / Path(os.getenv('TRAIN_NAME') + "_" + os.getenv("TRAIN_START_TIME"))
@@ -14,7 +15,7 @@ yolo_events_log_path_1: Path = trainn_dir / Path("yolo_events.log.1")
 pid_path: Path = working_dir / "pid.txt"
 
 
-def check_error() -> any:
+def check_error() -> Any:
     # Check if output file exists
     result: dict = {"success": True, "message": "Training has not started yet"}
     get_time()
