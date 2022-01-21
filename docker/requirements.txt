@@ -2,7 +2,7 @@ aiofiles==0.4.0
 delegator-py==0.1.1
 fastapi==0.35.0
 fire==0.2.1
-ipython==7.7.0
+ipython==7.16.3
 matplotlib==3.1.1
 numpy==1.17.0
 opencv-python==4.1.0.25
