@@ -1,4 +1,4 @@
-FROM docker.io/nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04
+FROM nvidia/cuda:11.1-cudnn8-devel-ubuntu20.04
 LABEL maintainer "BMW AG [Munich]"
 
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
@@ -23,7 +23,7 @@ RUN apt-get update && \
 
 
 # Install python-dev and pip
-RUN apt-get update && apt-get install -y python3-pip python3.6-dev
+RUN apt-get update && apt-get install -y python3-pip python3-dev
 
 # Install all needed python librarires 
 COPY ./docker/requirements.txt .
@@ -35,9 +35,10 @@ WORKDIR /training
 # Fetch Repo
 RUN git clone https://github.com/AlexeyAB/darknet.git 
 WORKDIR darknet
-#Checkout version should be yolov4 when stable version is released 
-# Checkout the last working version of Yolov4_pre
-RUN git checkout bef28445e57cd560fa3d0a24af98a562d289135b
+
+#Checkout version should be yolov4 when stable version is released and Cuda 11.1 with Cudnn 8 support commit is added under yolov4 tag
+# Checkout master containing fix commit of cuda 11.1 and cudnn 8 support 
+RUN git checkout master
 
 # Modify Makefile according to needed env variables
 RUN \ 
