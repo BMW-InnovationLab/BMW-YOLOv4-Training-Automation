@@ -1,4 +1,4 @@
-FROM nvidia/cuda:11.1-cudnn8-devel-ubuntu20.04
+FROM nvidia/cuda:11.5.1-cudnn8-devel-ubuntu20.04
 LABEL maintainer "BMW AG [Munich]"
 
 RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
