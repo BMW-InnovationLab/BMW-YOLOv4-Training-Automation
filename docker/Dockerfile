@@ -1,7 +1,7 @@
-FROM docker.io/nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04
+FROM nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04
 LABEL maintainer "BMW AG [Munich]"
 
-RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+ARG DEBIAN_FRONTEND=noninteractive
 
 ARG GPU=1
 ARG CUDNN=1
@@ -13,6 +13,15 @@ ARG OPENMP=0
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
 ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
+
+# Fix Nvidia/Cuda repository key rotation
+RUN sed -i '/developer\.download\.nvidia\.com\/compute\/cuda\/repos/d' /etc/apt/sources.list.d/*
+RUN sed -i '/developer\.download\.nvidia\.com\/compute\/machine-learning\/repos/d' /etc/apt/sources.list.d/*  
+RUN apt-key del 7fa2af80 &&\
+	apt-get update && \
+	apt-get  install -y wget && \
+    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-keyring_1.0-1_all.deb && \
+    dpkg -i cuda-keyring_1.0-1_all.deb
 
 # Install needed libraries
 RUN apt-get update && \
