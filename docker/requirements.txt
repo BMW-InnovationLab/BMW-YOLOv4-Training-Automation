@@ -1,3 +1,4 @@
+protobuf==3.19.6
 aiofiles==0.4.0
 delegator-py==0.1.1
 fastapi==0.35.0
