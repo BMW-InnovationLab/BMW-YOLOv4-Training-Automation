@@ -218,6 +218,10 @@ Issue related to darknet itself can be filed in [the correct repo](https://githu
 - If training finishes immediately without any error you should decrease batch size and subdivisions.
 - if training on multiple GPU produce nan try decreasing the learning rate to 0,00065
 
+## Citing
+
+If you use this repository in your research, consider citing it using the following Bibtex entry:
+
 ```
 @misc{bmwyolotool,
   author = {BMW TechOffice MUNICH},
