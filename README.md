@@ -218,6 +218,14 @@ Issue related to darknet itself can be filed in [the correct repo](https://githu
 - If training finishes immediately without any error you should decrease batch size and subdivisions.
 - if training on multiple GPU produce nan try decreasing the learning rate to 0,00065
 
+```
+@misc{bmwyolotool,
+  author = {BMW TechOffice MUNICH},
+  title = {YOLO Training Automation API},
+  howpublished = {\url{https://github.com/BMW-InnovationLab/BMW-YOLOv4-Training-Automation}},
+  year = {2019},
+}
+```
 
 ## Acknowledgements
 
