@@ -8,7 +8,7 @@ mypy = "*"
 
 [packages]
 aiofiles = "==0.4.0"
-fastapi = "==0.35.0"
+fastapi = "==0.65.2"
 fire = "==0.2.1"
 ipython = "==7.7.0"
 matplotlib = "==3.1.1"
